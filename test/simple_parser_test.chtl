@@ -1,0 +1,16 @@
+div
+{
+    id: "container";
+    class: "main";
+    
+    style
+    {
+        width: 100px;
+        height: 200px;
+    }
+    
+    text
+    {
+        "Hello CHTL Parser!"
+    }
+}
