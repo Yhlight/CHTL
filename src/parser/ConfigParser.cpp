@@ -1,16 +1,82 @@
 #include "ConfigParser.h"
+#include "../lexer/BasicLexer.h"
 #include <algorithm>
 #include <sstream>
+#include <iostream>
+#include <chrono>
 
 namespace chtl {
 
+// ConfigCache静态成员定义
+std::unordered_map<size_t, ConfigCache::CacheEntry> ConfigCache::cache;
+static bool cacheEnabled = true;
+
+bool ConfigCache::get(size_t hash, CacheEntry& entry) {
+    if (!cacheEnabled) return false;
+    
+    auto it = cache.find(hash);
+    if (it != cache.end()) {
+        entry = it->second;
+        return true;
+    }
+    return false;
+}
+
+void ConfigCache::put(size_t hash, const CacheEntry& entry) {
+    if (!cacheEnabled) return;
+    
+    // 简单的LRU：如果缓存满了，删除最早的条目
+    if (cache.size() >= MAX_CACHE_SIZE) {
+        cache.erase(cache.begin());
+    }
+    
+    cache[hash] = entry;
+}
+
+void ConfigCache::clear() {
+    cache.clear();
+}
+
+size_t ConfigCache::computeHash(const std::vector<Token>& tokens) {
+    size_t hash = 0;
+    
+    // 只对[Configuration]块计算哈希
+    bool inConfig = false;
+    int braceCount = 0;
+    
+    for (const auto& token : tokens) {
+        if (token.type == TokenType::KEYWORD_CONFIGURATION) {
+            inConfig = true;
+        }
+        
+        if (inConfig) {
+            // 使用token类型和值计算哈希
+            hash ^= std::hash<int>{}(static_cast<int>(token.type)) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+            hash ^= std::hash<std::string>{}(token.value) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+            
+            if (token.type == TokenType::LEFT_BRACE) {
+                braceCount++;
+            } else if (token.type == TokenType::RIGHT_BRACE) {
+                braceCount--;
+                if (braceCount == 0 && inConfig) {
+                    break;  // 配置块结束
+                }
+            }
+        }
+    }
+    
+    return hash;
+}
+
 ConfigParser::ConfigParser() 
-    : BasicParser(), configApplied(false) {
+    : BasicParser(), configApplied(false), 
+      dynamicKeywordLookups(0), dynamicKeywordHits(0) {
     setDefaultConfig();
 }
 
 ConfigParser::ConfigParser(std::shared_ptr<ChtlLoader> fileLoader)
-    : BasicParser(fileLoader), configApplied(false) {
+    : BasicParser(fileLoader), configApplied(false),
+      dynamicKeywordLookups(0), dynamicKeywordHits(0) {
     setDefaultConfig();
 }
 
@@ -47,28 +113,80 @@ void ConfigParser::setDefaultConfig() {
 }
 
 NodePtr ConfigParser::parse(const std::vector<Token>& tokenList) {
+    auto startTime = std::chrono::high_resolution_clock::now();
+    
     tokens = tokenList;
     current = 0;
     
     auto root = std::make_shared<RootNode>();
     
-    // 第一遍扫描：查找[Configuration]块
-    for (size_t i = 0; i < tokens.size(); ++i) {
-        if (tokens[i].type == TokenType::KEYWORD_CONFIGURATION) {
-            // 临时解析配置块
-            current = i + 1; // 移动到[Configuration]之后，这样previous()会返回[Configuration]
-            auto configNode = BasicParser::parseConfiguration();
-            
-            if (configNode) {
-                auto config = std::dynamic_pointer_cast<ConfigurationNode>(configNode);
-                if (config) {
-                    applyConfiguration(config.get());
-                    configApplied = true;
-                    root->addChild(configNode);
-                }
-            }
-            break;
+    // 计算配置哈希
+    size_t configHash = ConfigCache::computeHash(tokens);
+    
+    // 尝试从缓存获取配置
+    ConfigCache::CacheEntry cacheEntry;
+    if (ConfigCache::get(configHash, cacheEntry)) {
+        // 使用缓存的配置
+        configMap = cacheEntry.configMap;
+        optionsMap = cacheEntry.optionsMap;
+        dynamicKeywords = cacheEntry.dynamicKeywords;
+        configApplied = true;
+        
+        if (isDebugMode()) {
+            std::cout << "[ConfigParser] Using cached configuration" << std::endl;
         }
+    } else {
+        // 第一遍扫描：查找[Configuration]块
+        for (size_t i = 0; i < tokens.size(); ++i) {
+            if (tokens[i].type == TokenType::KEYWORD_CONFIGURATION) {
+                // 临时解析配置块
+                current = i + 1; // 移动到[Configuration]之后，这样previous()会返回[Configuration]
+                auto configNode = BasicParser::parseConfiguration();
+                
+                if (configNode) {
+                    auto config = std::dynamic_pointer_cast<ConfigurationNode>(configNode);
+                    if (config) {
+                        // 验证配置
+                        validateConfiguration(config.get());
+                        
+                        if (validationResult.isValid) {
+                            applyConfiguration(config.get());
+                            configApplied = true;
+                            root->addChild(configNode);
+                            
+                            // 缓存配置
+                            cacheEntry.configNode = config;
+                            cacheEntry.configMap = configMap;
+                            cacheEntry.optionsMap = optionsMap;
+                            cacheEntry.dynamicKeywords = dynamicKeywords;
+                            cacheEntry.hash = configHash;
+                            ConfigCache::put(configHash, cacheEntry);
+                        } else {
+                            // 报告验证错误但继续解析
+                            if (isDebugMode()) {
+                                std::cout << "[ConfigParser] Configuration validation failed:" << std::endl;
+                                for (const auto& err : validationResult.errors) {
+                                    std::cout << "  ERROR: " << err << std::endl;
+                                }
+                                for (const auto& warn : validationResult.warnings) {
+                                    std::cout << "  WARNING: " << warn << std::endl;
+                                }
+                            }
+                            // 仍然应用配置，但标记为无效
+                            applyConfiguration(config.get());
+                            configApplied = true;
+                            root->addChild(configNode);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+    
+    // 优化动态关键字映射
+    if (configApplied) {
+        optimizeDynamicKeywordMap();
     }
     
     // 第二遍解析：使用配置驱动的解析
@@ -104,7 +222,178 @@ NodePtr ConfigParser::parse(const std::vector<Token>& tokenList) {
         }
     }
     
+    auto endTime = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+    
+    if (isDebugMode()) {
+        std::cout << "[ConfigParser] Parse time: " << duration.count() << " microseconds" << std::endl;
+        printPerformanceStats();
+    }
+    
     return root;
+}
+
+void ConfigParser::validateConfiguration(ConfigurationNode* config) {
+    validationResult = ConfigValidationResult();  // 重置验证结果
+    
+    // 获取所有配置项
+    auto items = config->getConfigItems();
+    
+    // 1. 检查必需的配置项
+    std::vector<std::string> requiredKeys = {
+        "INDEX_INITIAL_COUNT", "DEBUG_MODE"
+    };
+    
+    for (const auto& key : requiredKeys) {
+        if (items.find(key) == items.end()) {
+            validationResult.addWarning("Missing recommended configuration: " + key);
+        }
+    }
+    
+    // 2. 验证配置值
+    for (const auto& pair : items) {
+        if (!isValidConfigValue(pair.first, pair.second)) {
+            validationResult.addError("Invalid value for " + pair.first + ": " + pair.second);
+        }
+    }
+    
+    // 3. 检查关键字冲突
+    checkKeywordConflicts();
+    
+    // 4. 检查循环定义
+    checkCircularDefinitions();
+    
+    // 5. 验证组选项
+    for (const auto& child : config->getChildren()) {
+        auto itemNode = std::dynamic_pointer_cast<ConfigItemNode>(child);
+        if (itemNode && itemNode->hasOptions()) {
+            auto options = itemNode->getOptions();
+            if (options.empty()) {
+                validationResult.addError("Empty option group for " + itemNode->getKey());
+            }
+            
+            // 检查重复选项
+            std::unordered_set<std::string> seen;
+            for (const auto& opt : options) {
+                if (seen.count(opt)) {
+                    validationResult.addWarning("Duplicate option '" + opt + "' in " + itemNode->getKey());
+                }
+                seen.insert(opt);
+            }
+        }
+    }
+}
+
+bool ConfigParser::isValidConfigValue(const std::string& key, const std::string& value) {
+    // 验证布尔值
+    if (key == "DEBUG_MODE" || key == "DISABLE_NAME_GROUP") {
+        return value == "true" || value == "false";
+    }
+    
+    // 验证数字值
+    if (key == "INDEX_INITIAL_COUNT" || key == "OPTION_COUNT") {
+        try {
+            std::stoi(value);
+            return true;
+        } catch (...) {
+            return false;
+        }
+    }
+    
+    // 验证关键字不为空
+    if (key.find("KEYWORD_") == 0 || key.find("CUSTOM_") == 0 || 
+        key.find("TEMPLATE_") == 0 || key.find("ORIGIN_") == 0) {
+        return !value.empty();
+    }
+    
+    return true;
+}
+
+void ConfigParser::checkKeywordConflicts() {
+    std::unordered_map<std::string, std::vector<std::string>> keywordUsage;
+    
+    // 收集所有关键字使用情况
+    for (const auto& pair : configMap) {
+        if (pair.first.find("KEYWORD_") == 0 || pair.first.find("CUSTOM_") == 0 ||
+            pair.first.find("TEMPLATE_") == 0 || pair.first.find("ORIGIN_") == 0) {
+            keywordUsage[pair.second].push_back(pair.first);
+        }
+    }
+    
+    // 检查组选项中的关键字
+    for (const auto& pair : optionsMap) {
+        for (const auto& opt : pair.second) {
+            keywordUsage[opt].push_back(pair.first + " (option)");
+        }
+    }
+    
+    // 报告冲突
+    for (const auto& pair : keywordUsage) {
+        if (pair.second.size() > 1) {
+            std::stringstream ss;
+            ss << "Keyword '" << pair.first << "' is used by multiple configurations: ";
+            for (size_t i = 0; i < pair.second.size(); ++i) {
+                if (i > 0) ss << ", ";
+                ss << pair.second[i];
+            }
+            validationResult.addWarning(ss.str());
+        }
+    }
+}
+
+void ConfigParser::checkCircularDefinitions() {
+    // 检查配置值是否引用了其他配置键
+    for (const auto& pair : configMap) {
+        // 简单检查：配置值是否包含其他配置键
+        for (const auto& other : configMap) {
+            if (pair.first != other.first && pair.second.find(other.first) != std::string::npos) {
+                validationResult.addWarning("Potential circular reference: " + 
+                    pair.first + " references " + other.first);
+            }
+        }
+    }
+}
+
+void ConfigParser::optimizeDynamicKeywordMap() {
+    // 构建反向映射以加速查找
+    reverseKeywordMap.clear();
+    
+    for (const auto& pair : dynamicKeywords) {
+        reverseKeywordMap[pair.second].insert(pair.first);
+    }
+    
+    // 预分配桶大小以减少哈希冲突
+    dynamicKeywords.reserve(dynamicKeywords.size() * 2);
+}
+
+void ConfigParser::printPerformanceStats() const {
+    std::cout << "[ConfigParser Performance Stats]" << std::endl;
+    std::cout << "  Dynamic keyword lookups: " << dynamicKeywordLookups << std::endl;
+    std::cout << "  Dynamic keyword hits: " << dynamicKeywordHits << std::endl;
+    
+    if (dynamicKeywordLookups > 0) {
+        double hitRate = (double)dynamicKeywordHits / dynamicKeywordLookups * 100;
+        std::cout << "  Hit rate: " << hitRate << "%" << std::endl;
+    }
+    
+    std::cout << "  Total dynamic keywords: " << dynamicKeywords.size() << std::endl;
+    std::cout << "  Total configurations: " << configMap.size() << std::endl;
+}
+
+void ConfigParser::enableCache(bool enable) {
+    cacheEnabled = enable;
+    if (!enable) {
+        ConfigCache::clear();
+    }
+}
+
+void ConfigParser::warmupCache(const std::string& configContent) {
+    // 预热缓存：解析配置并存储
+    BasicLexer lexer;
+    auto tokens = lexer.tokenize(configContent);
+    
+    ConfigParser parser;
+    parser.parse(tokens);
 }
 
 void ConfigParser::applyConfiguration(ConfigurationNode* config) {
@@ -393,23 +682,11 @@ bool ConfigParser::matchDynamic(TokenType expectedType) {
     if (check(TokenType::IDENTIFIER)) {
         std::string text = peek().value;
         
-        // 检查是否匹配任何配置的关键字
-        for (const auto& pair : configMap) {
-            if (configValueToTokenType(pair.first, "") == expectedType) {
-                if (text == pair.second) {
-                    advance();
-                    return true;
-                }
-                
-                // 检查组选项
-                if (optionsMap.count(pair.first)) {
-                    const auto& options = optionsMap[pair.first];
-                    if (std::find(options.begin(), options.end(), text) != options.end()) {
-                        advance();
-                        return true;
-                    }
-                }
-            }
+        // 使用反向映射快速查找
+        auto it = reverseKeywordMap.find(expectedType);
+        if (it != reverseKeywordMap.end() && it->second.count(text)) {
+            advance();
+            return true;
         }
     }
     
