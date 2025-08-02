@@ -1,0 +1,203 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "CHTL",
+    "patterns": [
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#numbers"
+        },
+        {
+            "include": "#elements"
+        },
+        {
+            "include": "#styles"
+        },
+        {
+            "include": "#configurations"
+        },
+        {
+            "include": "#imports"
+        },
+        {
+            "include": "#operators"
+        }
+    ],
+    "repository": {
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line.double-slash.chtl",
+                    "match": "//.*$"
+                },
+                {
+                    "name": "comment.block.chtl",
+                    "begin": "/\\*",
+                    "end": "\\*/"
+                },
+                {
+                    "name": "comment.line.double-dash.chtl",
+                    "match": "--.*$"
+                }
+            ]
+        },
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.control.chtl",
+                    "match": "\\b(if|else|for|while|return|break|continue)\\b"
+                },
+                {
+                    "name": "keyword.other.chtl",
+                    "match": "\\b(text|style|class|id|href|src|alt|title|type|name|value|placeholder|content)\\b"
+                },
+                {
+                    "name": "keyword.operator.chtl",
+                    "match": "\\b(add|delete|inherit|expect|not)\\b"
+                },
+                {
+                    "name": "storage.type.chtl",
+                    "match": "\\[\\s*(Custom|Template|Configuration|Import|Namespace|Origin)\\s*\\]"
+                },
+                {
+                    "name": "entity.name.tag.chtl",
+                    "match": "@(Style|Element|Var|Html|JavaScript)"
+                },
+                {
+                    "name": "constant.language.chtl",
+                    "match": "\\b(true|false|null)\\b"
+                }
+            ]
+        },
+        "strings": {
+            "patterns": [
+                {
+                    "name": "string.quoted.double.chtl",
+                    "begin": "\"",
+                    "end": "\"",
+                    "patterns": [
+                        {
+                            "name": "constant.character.escape.chtl",
+                            "match": "\\\\."
+                        }
+                    ]
+                },
+                {
+                    "name": "string.quoted.single.chtl",
+                    "begin": "'",
+                    "end": "'",
+                    "patterns": [
+                        {
+                            "name": "constant.character.escape.chtl",
+                            "match": "\\\\."
+                        }
+                    ]
+                },
+                {
+                    "name": "string.unquoted.chtl",
+                    "match": "(?<=:\\s*)[^\\s;{}\"']+(?=\\s*[;}])"
+                }
+            ]
+        },
+        "numbers": {
+            "patterns": [
+                {
+                    "name": "constant.numeric.chtl",
+                    "match": "\\b\\d+(\\.\\d+)?\\b"
+                }
+            ]
+        },
+        "elements": {
+            "patterns": [
+                {
+                    "name": "entity.name.tag.html.chtl",
+                    "match": "\\b(html|head|body|div|span|p|a|img|ul|ol|li|table|tr|td|th|form|input|button|select|option|textarea|h1|h2|h3|h4|h5|h6|header|footer|nav|main|section|article|aside|figure|figcaption|video|audio|canvas|svg|script|link|meta|title)\\b(?=\\s*\\{)"
+                }
+            ]
+        },
+        "styles": {
+            "patterns": [
+                {
+                    "name": "entity.other.attribute-name.class.chtl",
+                    "match": "\\.\\w+"
+                },
+                {
+                    "name": "entity.other.attribute-name.id.chtl",
+                    "match": "#\\w+"
+                },
+                {
+                    "name": "keyword.other.ampersand.chtl",
+                    "match": "&"
+                },
+                {
+                    "name": "support.type.property-name.css.chtl",
+                    "match": "\\b(color|background|background-color|font-size|font-family|font-weight|margin|padding|border|width|height|display|position|top|right|bottom|left|flex|grid|transform|transition|animation|opacity|visibility|z-index|overflow|cursor|outline|box-shadow|text-align|text-decoration|line-height|vertical-align|white-space|content)\\b(?=\\s*:)"
+                },
+                {
+                    "name": "entity.other.pseudo-class.chtl",
+                    "match": ":(hover|active|focus|visited|first-child|last-child|nth-child|before|after|disabled|checked)"
+                },
+                {
+                    "name": "entity.other.pseudo-element.chtl",
+                    "match": "::(before|after|first-letter|first-line|selection|placeholder)"
+                }
+            ]
+        },
+        "configurations": {
+            "patterns": [
+                {
+                    "name": "entity.name.section.chtl",
+                    "match": "\\[\\s*Name\\s*\\]"
+                },
+                {
+                    "name": "variable.other.chtl",
+                    "match": "\\b\\w+\\s*(?==)"
+                }
+            ]
+        },
+        "imports": {
+            "patterns": [
+                {
+                    "name": "string.quoted.import.chtl",
+                    "match": "(?<=\\[Import\\]\\s*)\"[^\"]+\""
+                },
+                {
+                    "name": "keyword.operator.wildcard.chtl",
+                    "match": "\\*"
+                }
+            ]
+        },
+        "operators": {
+            "patterns": [
+                {
+                    "name": "keyword.operator.assignment.chtl",
+                    "match": ":"
+                },
+                {
+                    "name": "keyword.operator.equality.chtl",
+                    "match": "="
+                },
+                {
+                    "name": "punctuation.separator.chtl",
+                    "match": "[,;]"
+                },
+                {
+                    "name": "punctuation.definition.block.chtl",
+                    "match": "[{}]"
+                },
+                {
+                    "name": "punctuation.definition.array.chtl",
+                    "match": "[\\[\\]]"
+                }
+            ]
+        }
+    },
+    "scopeName": "source.chtl"
+}

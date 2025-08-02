@@ -1,0 +1,76 @@
+// Example: CHTL with custom keywords (Chinese)
+[Configuration] {
+    text = 文本;
+    style = 样式;
+    class = 类名;
+    id = 标识;
+    
+    [Name] {
+        text = 文字;
+        style = 风格;
+    }
+}
+
+html {
+    head {
+        title { 文本 { "我的CHTL页面" } }
+    }
+    body {
+        div {
+            类名: "容器";
+            标识: "主要内容";
+            
+            样式 {
+                .容器 {
+                    @Style FlexCenter;
+                    padding: "20px";
+                }
+                
+                &:hover {
+                    background: "#f0f0f0";
+                }
+            }
+            
+            h1 { 文本 { "欢迎使用CHTL！" } }
+            
+            p {
+                文字 { "这是一个使用中文关键字的例子。" }
+            }
+        }
+    }
+}
+
+// Example: CHTL with custom keywords (Spanish)
+[Configuration] {
+    text = texto;
+    style = estilo;
+    class = clase;
+    id = identificador;
+}
+
+div {
+    clase: "tarjeta";
+    
+    estilo {
+        .tarjeta {
+            border: "1px solid #ccc";
+            border-radius: "8px";
+        }
+    }
+    
+    h2 { texto { "¡Hola CHTL!" } }
+    p { texto { "Este es un ejemplo con palabras clave en español." } }
+}
+
+// Example: CHTL with group options
+[Configuration] {
+    text (texto, texte, текст);
+    style (estilo, style, стиль);
+}
+
+section {
+    // Now you can use any of the options
+    h3 { texto { "Multiple language support" } }
+    h3 { texte { "Support multi-langue" } }
+    h3 { текст { "Поддержка нескольких языков" } }
+}

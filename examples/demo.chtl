@@ -1,0 +1,108 @@
+// CHTL Demo - 展示CHTL的强大功能
+html {
+    head {
+        title { text { "CHTL Demo Page" } }
+        meta { charset: "UTF-8"; }
+        
+        // 全局样式定义
+        style {
+            body {
+                margin: "0";
+                padding: "0";
+                font-family: "Arial, sans-serif";
+            }
+        }
+    }
+    
+    body {
+        // 使用预定义元素
+        @Element Header {
+            @Element Container {
+                h1 {
+                    style {
+                        @Style Heading1;
+                        color: "white";
+                    }
+                    text { "Welcome to CHTL" }
+                }
+            }
+        }
+        
+        // 主内容区域
+        @Element Container {
+            // 使用自定义样式的卡片
+            @Element Card {
+                style {
+                    .card-header {
+                        @Style PaddingMedium;
+                        background-color: "#f0f0f0";
+                        font-weight: "bold";
+                    }
+                    
+                    .card-body {
+                        @Style PaddingLarge;
+                    }
+                }
+                
+                div {
+                    h2 { text { "CHTL Features" } }
+                    
+                    ul {
+                        li { text { "简洁的语法" } }
+                        li { text { "强大的样式系统" } }
+                        li { text { "自动类名分配" } }
+                        li { text { "预定义组件库" } }
+                    }
+                }
+            }
+            
+            // 表单示例
+            @Element FormGroup {
+                label { text { "Your Name:" } }
+                input {
+                    type: "text";
+                    placeholder: "Enter your name";
+                    style {
+                        @Style BaseInput;
+                    }
+                }
+            }
+            
+            // 按钮组
+            @Element ButtonGroup {
+                button {
+                    style {
+                        @Style BaseButton;
+                        @Style PrimaryColor;
+                        color: "white";
+                    }
+                    text { "Submit" }
+                }
+                
+                button {
+                    style {
+                        @Style BaseButton;
+                        @Style SecondaryColor;
+                        color: "white";
+                    }
+                    text { "Cancel" }
+                }
+            }
+        }
+        
+        // 页脚
+        @Element Footer {
+            @Element Container {
+                p {
+                    style {
+                        text-align: "center";
+                        @Style SmallText;
+                    }
+                    text { "© 2024 CHTL Compiler. Built with CHTL." }
+                }
+            }
+        }
+        
+        -- 这是一个生成器注释，会出现在HTML中
+    }
+}
