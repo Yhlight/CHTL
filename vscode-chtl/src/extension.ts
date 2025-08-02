@@ -4,8 +4,10 @@ import { ChtlHoverProvider } from './providers/hoverProvider';
 import { ChtlDefinitionProvider } from './providers/definitionProvider';
 import { ChtlDiagnosticProvider } from './providers/diagnosticProvider';
 import { ChtlFormattingProvider } from './providers/formattingProvider';
+import { ChtlSemanticTokensProvider } from './providers/semanticTokensProvider';
 import { PreviewPanel } from './preview/previewPanel';
 import { CompilerService } from './services/compilerService';
+import { ConfigurationParser } from './services/configurationParser';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('CHTL extension is now active!');
@@ -47,6 +49,15 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerDocumentFormattingEditProvider(
             selector,
             new ChtlFormattingProvider()
+        )
+    );
+
+    // Semantic tokens provider for dynamic syntax highlighting
+    context.subscriptions.push(
+        vscode.languages.registerDocumentSemanticTokensProvider(
+            selector,
+            new ChtlSemanticTokensProvider(),
+            ChtlSemanticTokensProvider.legend
         )
     );
 
@@ -111,6 +122,21 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor && editor.document.languageId === 'chtl') {
                 diagnosticProvider.updateDiagnostics(editor.document);
+                // Clear configuration cache for the new document
+                ConfigurationParser.clearCache(editor.document.uri);
+            }
+        })
+    );
+
+    // Watch for document changes to update configuration cache
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeTextDocument((event) => {
+            if (event.document.languageId === 'chtl') {
+                // Clear cache when document changes
+                ConfigurationParser.clearCache(event.document.uri);
+                
+                // Update diagnostics
+                diagnosticProvider.updateDiagnostics(event.document);
             }
         })
     );

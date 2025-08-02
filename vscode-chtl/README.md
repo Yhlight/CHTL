@@ -9,6 +9,7 @@ This extension provides comprehensive language support for CHTL (Concise HyperTe
 - Support for comments, strings, keywords, and special blocks
 - CSS property highlighting in style blocks
 - HTML element recognition
+- **Dynamic highlighting for custom keywords from Configuration blocks**
 
 ### Auto-completion
 - HTML elements with snippets
@@ -16,6 +17,8 @@ This extension provides comprehensive language support for CHTL (Concise HyperTe
 - CSS properties and values
 - Predefined styles and elements
 - Context-aware suggestions
+- **Custom keywords from Configuration blocks**
+- **Multi-language keyword support**
 
 ### Code Snippets
 - HTML template boilerplate
@@ -76,6 +79,7 @@ This extension provides comprehensive language support for CHTL (Concise HyperTe
 
 ## Example CHTL Code
 
+### Standard CHTL
 ```chtl
 html {
     head {
@@ -100,6 +104,23 @@ html {
             }
         }
     }
+}
+```
+
+### CHTL with Custom Keywords (Chinese)
+```chtl
+[Configuration] {
+    text = 文本;
+    style = 样式;
+    class = 类名;
+}
+
+div {
+    类名: "卡片";
+    样式 {
+        .卡片 { padding: "10px"; }
+    }
+    h1 { 文本 { "欢迎！" } }
 }
 ```
 

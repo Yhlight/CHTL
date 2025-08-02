@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { ConfigurationParser } from '../services/configurationParser';
 
 export class ChtlHoverProvider implements vscode.HoverProvider {
     private chtlDocs: { [key: string]: string } = {
@@ -42,6 +43,17 @@ export class ChtlHoverProvider implements vscode.HoverProvider {
         }
 
         const word = document.getText(wordRange);
+        
+        // Check if it's a custom keyword
+        if (ConfigurationParser.isCustomKeyword(document, word)) {
+            const originalKeyword = ConfigurationParser.getOriginalKeyword(document, word);
+            if (originalKeyword && this.chtlDocs[originalKeyword]) {
+                const customDoc = `**Custom keyword**: \`${word}\` → \`${originalKeyword}\`\n\n${this.chtlDocs[originalKeyword]}`;
+                return new vscode.Hover(customDoc);
+            } else {
+                return new vscode.Hover(`**Custom keyword**: \`${word}\``);
+            }
+        }
         
         // Check for special blocks
         const line = document.lineAt(position.line).text;

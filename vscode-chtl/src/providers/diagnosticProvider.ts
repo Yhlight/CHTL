@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { ConfigurationParser } from '../services/configurationParser';
 
 export class ChtlDiagnosticProvider {
     private diagnosticCollection: vscode.DiagnosticCollection;
@@ -30,6 +31,9 @@ export class ChtlDiagnosticProvider {
             
             // Check for duplicate IDs
             this.checkDuplicateIds(text, line, i, diagnostics);
+            
+            // Check custom keyword usage
+            this.checkCustomKeywordUsage(document, line, i, diagnostics);
         }
 
         // Check overall structure
@@ -124,6 +128,29 @@ export class ChtlDiagnosticProvider {
                 vscode.DiagnosticSeverity.Error
             );
             diagnostics.push(diagnostic);
+        }
+    }
+
+    private checkCustomKeywordUsage(document: vscode.TextDocument, line: string, lineNumber: number, diagnostics: vscode.Diagnostic[]): void {
+        // Check if configuration block exists
+        const text = document.getText();
+        const hasConfig = text.includes('[Configuration]');
+        
+        if (!hasConfig) {
+            // Check if any words look like custom keywords (non-standard identifiers)
+            const unusualKeywords = /\b(texto|estilos?|clase|текст|样式|スタイル)\b/gi;
+            let match;
+            
+            while ((match = unusualKeywords.exec(line)) !== null) {
+                const range = new vscode.Range(lineNumber, match.index, lineNumber, match.index + match[0].length);
+                const diagnostic = new vscode.Diagnostic(
+                    range,
+                    `"${match[0]}" might be a custom keyword. Consider adding a [Configuration] block to define custom keywords.`,
+                    vscode.DiagnosticSeverity.Information
+                );
+                diagnostic.code = 'custom-keyword-hint';
+                diagnostics.push(diagnostic);
+            }
         }
     }
 

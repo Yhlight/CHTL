@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { ConfigurationParser } from '../services/configurationParser';
 
 export class ChtlCompletionProvider implements vscode.CompletionItemProvider {
     private htmlElements = [
@@ -54,6 +55,9 @@ export class ChtlCompletionProvider implements vscode.CompletionItemProvider {
         const line = document.lineAt(position);
         const lineText = line.text.substring(0, position.character);
         const items: vscode.CompletionItem[] = [];
+        
+        // Get custom keywords from configuration
+        const customKeywords = ConfigurationParser.getAllCustomKeywords(document);
 
         // Check context
         if (context.triggerCharacter === '@') {
@@ -134,16 +138,29 @@ export class ChtlCompletionProvider implements vscode.CompletionItemProvider {
                 items.push(item);
             });
 
-            // CHTL keywords
+            // CHTL keywords (including custom keywords)
             this.chtlKeywords.forEach(keyword => {
-                const item = new vscode.CompletionItem(keyword, vscode.CompletionItemKind.Keyword);
+                // Get the effective keyword (might be customized)
+                const effectiveKeyword = ConfigurationParser.getEffectiveKeyword(document, keyword);
+                
+                const item = new vscode.CompletionItem(effectiveKeyword, vscode.CompletionItemKind.Keyword);
                 if (keyword === 'text') {
-                    item.insertText = new vscode.SnippetString('text { "$1" }');
+                    item.insertText = new vscode.SnippetString(`${effectiveKeyword} { "$1" }`);
                 } else if (keyword === 'style') {
-                    item.insertText = new vscode.SnippetString('style {\n\t$0\n}');
+                    item.insertText = new vscode.SnippetString(`${effectiveKeyword} {\n\t$0\n}`);
                 }
-                item.detail = `CHTL ${keyword} keyword`;
+                item.detail = `CHTL ${keyword} keyword${effectiveKeyword !== keyword ? ' (customized)' : ''}`;
                 items.push(item);
+            });
+            
+            // Add custom keywords that don't override defaults
+            customKeywords.forEach(customKeyword => {
+                const originalKeyword = ConfigurationParser.getOriginalKeyword(document, customKeyword);
+                if (!originalKeyword || !this.chtlKeywords.includes(originalKeyword)) {
+                    const item = new vscode.CompletionItem(customKeyword, vscode.CompletionItemKind.Keyword);
+                    item.detail = 'Custom keyword';
+                    items.push(item);
+                }
             });
 
             // CSS properties (if in style context)
