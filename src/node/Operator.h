@@ -20,6 +20,12 @@ public:
     };
     
     explicit OperatorNode(OperatorType type, const NodePosition& position = NodePosition());
+    
+protected:
+    // 为子类提供的构造函数，允许指定特定的NodeType
+    OperatorNode(OperatorType type, NodeType nodeType, const NodePosition& position = NodePosition());
+    
+public:
     virtual ~OperatorNode() = default;
     
     // 操作符类型

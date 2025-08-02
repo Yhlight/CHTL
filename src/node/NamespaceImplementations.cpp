@@ -25,26 +25,25 @@ void NamespaceNode::clearName() {
     name_.clear();
 }
 
-void NamespaceNode::addMember(const std::string& member) {
-    if (std::find(members_.begin(), members_.end(), member) == members_.end()) {
-        members_.push_back(member);
-    }
+void NamespaceNode::addMember(const std::string& name, std::shared_ptr<Node> member) {
+    members_[name] = member;
 }
 
-void NamespaceNode::removeMember(const std::string& member) {
-    members_.erase(std::remove(members_.begin(), members_.end(), member), members_.end());
+void NamespaceNode::removeMember(const std::string& name) {
+    members_.erase(name);
 }
 
-const std::vector<std::string>& NamespaceNode::getMembers() const {
+std::shared_ptr<Node> NamespaceNode::findMember(const std::string& name) const {
+    auto it = members_.find(name);
+    return it != members_.end() ? it->second : nullptr;
+}
+
+std::unordered_map<std::string, std::shared_ptr<Node>> NamespaceNode::getAllMembers() const {
     return members_;
 }
 
-void NamespaceNode::clearMembers() {
-    members_.clear();
-}
-
-bool NamespaceNode::hasMember(const std::string& member) const {
-    return std::find(members_.begin(), members_.end(), member) != members_.end();
+bool NamespaceNode::hasMember(const std::string& name) const {
+    return members_.find(name) != members_.end();
 }
 
 size_t NamespaceNode::getMemberCount() const {
@@ -246,12 +245,13 @@ std::string NamespaceNode::toDebugString(int indent) const {
 }
 
 std::shared_ptr<Node> NamespaceNode::clone() const {
-    auto cloned = std::make_shared<NamespaceNode>(getPosition());
-    cloned->copyBaseProperties(*this);
-    cloned->name_ = name_;
+    auto cloned = std::make_shared<NamespaceNode>(namespaceName_, getPosition());
+    cloned->fullPath_ = fullPath_;
+    cloned->parentNamespace_ = parentNamespace_;
     cloned->members_ = members_;
-    cloned->aliases_ = aliases_;
-    cloned->description_ = description_;
+    cloned->typeAliases_ = typeAliases_;
+    cloned->usings_ = usings_;
+    cloned->accessLevel_ = accessLevel_;
     
     // 克隆子命名空间
     for (const auto& child : childNamespaces_) {
@@ -557,8 +557,8 @@ void UsingNode::accept(NodeVisitor& visitor) {
 // NamespaceManager实现
 NamespaceManager::NamespaceManager() {
     // 创建全局命名空间
-    globalNamespace_ = std::make_shared<NamespaceNode>();
-    globalNamespace_->setName("global");
+    globalNamespace_ = std::make_shared<NamespaceNode>("");
+    globalNamespace_->setNamespaceName("global");
     currentNamespace_ = globalNamespace_;
 }
 
@@ -573,8 +573,8 @@ std::shared_ptr<NamespaceNode> NamespaceManager::getCurrentNamespace() const {
 void NamespaceManager::enterNamespace(const std::string& name) {
     auto child = currentNamespace_->findChildNamespace(name);
     if (!child) {
-        child = std::make_shared<NamespaceNode>();
-        child->setName(name);
+        child = std::make_shared<NamespaceNode>(name);
+        child->setNamespaceName(name);
         child->setParentNamespace(currentNamespace_);
         currentNamespace_->addChildNamespace(child);
     }

@@ -110,6 +110,11 @@ struct NodePosition {
         : startLine(start.line), startColumn(start.column),
           endLine(end.line), endColumn(end.column),
           startOffset(start.offset), endOffset(end.offset) {}
+    
+    std::string toString() const {
+        return "[" + std::to_string(startLine) + ":" + std::to_string(startColumn) + "-" +
+               std::to_string(endLine) + ":" + std::to_string(endColumn) + "]";
+    }
 };
 
 /**

@@ -4,43 +4,35 @@
 
 namespace chtl {
 
-// OperatorNode实现
+// OperatorNode基类实现
 OperatorNode::OperatorNode(OperatorType type, const NodePosition& position)
-    : Node(NodeType::OPERATOR, position), operatorType_(type) {
-}
+    : Node(NodeType::OPERATOR, position), operatorType_(type) {}
+
+// 为子类提供的构造函数
+OperatorNode::OperatorNode(OperatorType type, NodeType nodeType, const NodePosition& position)
+    : Node(nodeType, position), operatorType_(type) {}
 
 OperatorNode::OperatorType OperatorNode::getOperatorType() const {
     return operatorType_;
 }
 
-void OperatorNode::setOperatorType(OperatorType type) {
-    operatorType_ = type;
-}
-
-std::string OperatorNode::getOperatorName() const {
-    return operatorTypeToString();
+std::string OperatorNode::operatorTypeToString() const {
+    switch (operatorType_) {
+        case OperatorType::ADD:     return "add";
+        case OperatorType::DELETE:  return "delete";
+        case OperatorType::FROM:    return "from";
+        case OperatorType::AS:      return "as";
+        case OperatorType::INHERIT: return "inherit";
+        default:                    return "unknown";
+    }
 }
 
 bool OperatorNode::validate() const {
-    if (!Node::validate()) {
-        return false;
-    }
-    
-    // 验证操作符类型是否有效
-    switch (operatorType_) {
-        case OperatorType::ADD:
-        case OperatorType::DELETE:
-        case OperatorType::FROM:
-        case OperatorType::AS:
-        case OperatorType::INHERIT:
-            return true;
-        default:
-            return false;
-    }
+    return Node::validate();
 }
 
 std::string OperatorNode::toString() const {
-    return getOperatorName();
+    return operatorTypeToString();
 }
 
 std::string OperatorNode::toDebugString(int indent) const {
@@ -54,93 +46,104 @@ std::string OperatorNode::toDebugString(int indent) const {
 }
 
 std::shared_ptr<Node> OperatorNode::clone() const {
-    auto cloned = std::make_shared<OperatorNode>(operatorType_, getPosition());
-    cloned->copyBaseProperties(*this);
-    return cloned;
+    return std::make_shared<OperatorNode>(operatorType_, getPosition());
 }
 
 void OperatorNode::accept(NodeVisitor& visitor) {
-    visitor.visit(*this);
-}
-
-std::string OperatorNode::operatorTypeToString() const {
-    switch (operatorType_) {
-        case OperatorType::ADD:    return "add";
-        case OperatorType::DELETE: return "delete";
-        case OperatorType::FROM:   return "from";
-        case OperatorType::AS:     return "as";
-        case OperatorType::INHERIT:return "inherit";
-        default:                   return "unknown";
-    }
+    // 访问者模式需要NodeVisitor有visit方法，这里暂时空实现
+    (void)visitor;
 }
 
 // AddOperatorNode实现
 AddOperatorNode::AddOperatorNode(const NodePosition& position)
-    : OperatorNode(OperatorType::ADD, position) {
-    setNodeType(NodeType::ADD_OPERATOR);
+    : OperatorNode(OperatorType::ADD, NodeType::ADD_OPERATOR, position), targetType_(TargetType::ELEMENT), 
+      index_(0), hasIndex_(false), hasValue_(false) {
 }
 
-void AddOperatorNode::addTarget(const std::string& target) {
-    if (std::find(targets_.begin(), targets_.end(), target) == targets_.end()) {
-        targets_.push_back(target);
-    }
+void AddOperatorNode::setTarget(const std::string& target) {
+    target_ = target;
 }
 
-void AddOperatorNode::removeTarget(const std::string& target) {
-    targets_.erase(std::remove(targets_.begin(), targets_.end(), target), targets_.end());
+std::string AddOperatorNode::getTarget() const {
+    return target_;
 }
 
-const std::vector<std::string>& AddOperatorNode::getTargets() const {
-    return targets_;
+void AddOperatorNode::setTargetType(TargetType type) {
+    targetType_ = type;
 }
 
-void AddOperatorNode::clearTargets() {
-    targets_.clear();
+AddOperatorNode::TargetType AddOperatorNode::getTargetType() const {
+    return targetType_;
 }
 
-bool AddOperatorNode::hasTarget(const std::string& target) const {
-    return std::find(targets_.begin(), targets_.end(), target) != targets_.end();
+void AddOperatorNode::setIndex(size_t index) {
+    index_ = index;
+    hasIndex_ = true;
 }
 
-void AddOperatorNode::setTargetValue(const std::string& target, const std::string& value) {
-    targetValues_[target] = value;
+size_t AddOperatorNode::getIndex() const {
+    return index_;
 }
 
-std::string AddOperatorNode::getTargetValue(const std::string& target) const {
-    auto it = targetValues_.find(target);
-    return it != targetValues_.end() ? it->second : "";
+bool AddOperatorNode::hasIndex() const {
+    return hasIndex_;
 }
 
-void AddOperatorNode::removeTargetValue(const std::string& target) {
-    targetValues_.erase(target);
+void AddOperatorNode::setValue(const std::string& value) {
+    value_ = value;
+    hasValue_ = true;
 }
 
-bool AddOperatorNode::hasTargetValue(const std::string& target) const {
-    return targetValues_.find(target) != targetValues_.end();
+std::string AddOperatorNode::getValue() const {
+    return value_;
+}
+
+bool AddOperatorNode::hasValue() const {
+    return hasValue_;
+}
+
+void AddOperatorNode::addProperty(const std::string& name, const std::string& value) {
+    properties_[name] = value;
+}
+
+void AddOperatorNode::removeProperty(const std::string& name) {
+    properties_.erase(name);
+}
+
+std::unordered_map<std::string, std::string> AddOperatorNode::getProperties() const {
+    return properties_;
 }
 
 bool AddOperatorNode::validate() const {
     if (!OperatorNode::validate()) {
         return false;
     }
-    
-    // add操作符至少需要一个目标
-    return !targets_.empty();
+    return !target_.empty();
 }
 
 std::string AddOperatorNode::toString() const {
     std::stringstream ss;
-    ss << "add ";
-    for (size_t i = 0; i < targets_.size(); ++i) {
-        if (i > 0) ss << ", ";
-        ss << targets_[i];
-        
-        // 如果有值，添加值
-        auto it = targetValues_.find(targets_[i]);
-        if (it != targetValues_.end()) {
-            ss << ": " << it->second;
-        }
+    ss << "add " << targetTypeToString() << " " << target_;
+    
+    if (hasIndex_) {
+        ss << "[" << index_ << "]";
     }
+    
+    if (hasValue_) {
+        ss << " = " << value_;
+    }
+    
+    if (!properties_.empty()) {
+        ss << " {";
+        bool first = true;
+        for (const auto& prop : properties_) {
+            if (!first) ss << ", ";
+            ss << prop.first << ": " << prop.second;
+            first = false;
+        }
+        ss << "}";
+    }
+    
     return ss.str();
 }
 
@@ -148,100 +151,139 @@ std::string AddOperatorNode::toDebugString(int indent) const {
     std::string indentStr(indent, ' ');
     std::stringstream ss;
     ss << indentStr << "AddOperatorNode {" << std::endl;
-    ss << indentStr << "  targets: [";
-    for (size_t i = 0; i < targets_.size(); ++i) {
-        if (i > 0) ss << ", ";
-        ss << targets_[i];
-    }
-    ss << "]" << std::endl;
+    ss << indentStr << "  target: " << target_ << std::endl;
+    ss << indentStr << "  targetType: " << targetTypeToString() << std::endl;
     
-    if (!targetValues_.empty()) {
-        ss << indentStr << "  values: {" << std::endl;
-        for (const auto& pair : targetValues_) {
-            ss << indentStr << "    " << pair.first << ": " << pair.second << std::endl;
+    if (hasIndex_) {
+        ss << indentStr << "  index: " << index_ << std::endl;
+    }
+    
+    if (hasValue_) {
+        ss << indentStr << "  value: " << value_ << std::endl;
+    }
+    
+    if (!properties_.empty()) {
+        ss << indentStr << "  properties: {" << std::endl;
+        for (const auto& prop : properties_) {
+            ss << indentStr << "    " << prop.first << ": " << prop.second << std::endl;
         }
         ss << indentStr << "  }" << std::endl;
     }
     
-    ss << indentStr << "  position: [" << getPosition().line << ":" << getPosition().column << "]" << std::endl;
+    ss << indentStr << "  position: " << getPosition().toString() << std::endl;
     ss << indentStr << "}";
     return ss.str();
 }
 
 std::shared_ptr<Node> AddOperatorNode::clone() const {
     auto cloned = std::make_shared<AddOperatorNode>(getPosition());
-    cloned->targets_ = targets_;
-    cloned->targetValues_ = targetValues_;
+    cloned->target_ = target_;
+    cloned->targetType_ = targetType_;
+    cloned->index_ = index_;
+    cloned->hasIndex_ = hasIndex_;
+    cloned->value_ = value_;
+    cloned->hasValue_ = hasValue_;
+    cloned->properties_ = properties_;
     return cloned;
 }
 
 void AddOperatorNode::accept(NodeVisitor& visitor) {
-    visitor.visit(*this);
+    (void)visitor; // 暂时空实现
+}
+
+std::string AddOperatorNode::targetTypeToString() const {
+    switch (targetType_) {
+        case TargetType::ELEMENT:  return "@Element";
+        case TargetType::STYLE:    return "@Style";
+        case TargetType::VAR:      return "@Var";
+        case TargetType::PROPERTY: return "property";
+        case TargetType::CHILD:    return "child";
+        default:                   return "unknown";
+    }
 }
 
 // DeleteOperatorNode实现
 DeleteOperatorNode::DeleteOperatorNode(const NodePosition& position)
-    : OperatorNode(OperatorType::DELETE, position) {
-    setNodeType(NodeType::DELETE_OPERATOR);
+    : OperatorNode(OperatorType::DELETE, NodeType::DELETE_OPERATOR, position), targetType_(TargetType::ELEMENT),
+      index_(0), hasIndex_(false), hasSelector_(false), hasPropertyName_(false) {
 }
 
-void DeleteOperatorNode::addTarget(const std::string& target) {
-    if (std::find(targets_.begin(), targets_.end(), target) == targets_.end()) {
-        targets_.push_back(target);
-    }
+void DeleteOperatorNode::setTarget(const std::string& target) {
+    target_ = target;
 }
 
-void DeleteOperatorNode::removeTarget(const std::string& target) {
-    targets_.erase(std::remove(targets_.begin(), targets_.end(), target), targets_.end());
+std::string DeleteOperatorNode::getTarget() const {
+    return target_;
 }
 
-const std::vector<std::string>& DeleteOperatorNode::getTargets() const {
-    return targets_;
+void DeleteOperatorNode::setTargetType(TargetType type) {
+    targetType_ = type;
 }
 
-void DeleteOperatorNode::clearTargets() {
-    targets_.clear();
+DeleteOperatorNode::TargetType DeleteOperatorNode::getTargetType() const {
+    return targetType_;
 }
 
-bool DeleteOperatorNode::hasTarget(const std::string& target) const {
-    return std::find(targets_.begin(), targets_.end(), target) != targets_.end();
+void DeleteOperatorNode::setIndex(size_t index) {
+    index_ = index;
+    hasIndex_ = true;
 }
 
-void DeleteOperatorNode::setCondition(const std::string& condition) {
-    condition_ = condition;
+size_t DeleteOperatorNode::getIndex() const {
+    return index_;
 }
 
-std::string DeleteOperatorNode::getCondition() const {
-    return condition_;
+bool DeleteOperatorNode::hasIndex() const {
+    return hasIndex_;
 }
 
-bool DeleteOperatorNode::hasCondition() const {
-    return !condition_.empty();
+void DeleteOperatorNode::setSelector(const std::string& selector) {
+    selector_ = selector;
+    hasSelector_ = !selector.empty();
 }
 
-void DeleteOperatorNode::clearCondition() {
-    condition_.clear();
+std::string DeleteOperatorNode::getSelector() const {
+    return selector_;
+}
+
+bool DeleteOperatorNode::hasSelector() const {
+    return hasSelector_;
+}
+
+void DeleteOperatorNode::setPropertyName(const std::string& propertyName) {
+    propertyName_ = propertyName;
+    hasPropertyName_ = !propertyName.empty();
+}
+
+std::string DeleteOperatorNode::getPropertyName() const {
+    return propertyName_;
+}
+
+bool DeleteOperatorNode::hasPropertyName() const {
+    return hasPropertyName_;
 }
 
 bool DeleteOperatorNode::validate() const {
     if (!OperatorNode::validate()) {
         return false;
     }
-    
-    // delete操作符至少需要一个目标
-    return !targets_.empty();
+    return !target_.empty();
 }
 
 std::string DeleteOperatorNode::toString() const {
     std::stringstream ss;
-    ss << "delete ";
-    for (size_t i = 0; i < targets_.size(); ++i) {
-        if (i > 0) ss << ", ";
-        ss << targets_[i];
+    ss << "delete " << targetTypeToString() << " " << target_;
+    
+    if (hasIndex_) {
+        ss << "[" << index_ << "]";
     }
     
-    if (!condition_.empty()) {
-        ss << " where " << condition_;
+    if (hasSelector_) {
+        ss << " " << selector_;
+    }
+    
+    if (hasPropertyName_) {
+        ss << "." << propertyName_;
     }
     
     return ss.str();
@@ -251,37 +293,59 @@ std::string DeleteOperatorNode::toDebugString(int indent) const {
     std::string indentStr(indent, ' ');
     std::stringstream ss;
     ss << indentStr << "DeleteOperatorNode {" << std::endl;
-    ss << indentStr << "  targets: [";
-    for (size_t i = 0; i < targets_.size(); ++i) {
-        if (i > 0) ss << ", ";
-        ss << targets_[i];
-    }
-    ss << "]" << std::endl;
+    ss << indentStr << "  target: " << target_ << std::endl;
+    ss << indentStr << "  targetType: " << targetTypeToString() << std::endl;
     
-    if (!condition_.empty()) {
-        ss << indentStr << "  condition: " << condition_ << std::endl;
+    if (hasIndex_) {
+        ss << indentStr << "  index: " << index_ << std::endl;
     }
     
-    ss << indentStr << "  position: [" << getPosition().line << ":" << getPosition().column << "]" << std::endl;
+    if (hasSelector_) {
+        ss << indentStr << "  selector: " << selector_ << std::endl;
+    }
+    
+    if (hasPropertyName_) {
+        ss << indentStr << "  propertyName: " << propertyName_ << std::endl;
+    }
+    
+    ss << indentStr << "  position: " << getPosition().toString() << std::endl;
     ss << indentStr << "}";
     return ss.str();
 }
 
 std::shared_ptr<Node> DeleteOperatorNode::clone() const {
     auto cloned = std::make_shared<DeleteOperatorNode>(getPosition());
-    cloned->targets_ = targets_;
-    cloned->condition_ = condition_;
+    cloned->target_ = target_;
+    cloned->targetType_ = targetType_;
+    cloned->index_ = index_;
+    cloned->hasIndex_ = hasIndex_;
+    cloned->selector_ = selector_;
+    cloned->hasSelector_ = hasSelector_;
+    cloned->propertyName_ = propertyName_;
+    cloned->hasPropertyName_ = hasPropertyName_;
     return cloned;
 }
 
 void DeleteOperatorNode::accept(NodeVisitor& visitor) {
-    visitor.visit(*this);
+    (void)visitor; // 暂时空实现
+}
+
+std::string DeleteOperatorNode::targetTypeToString() const {
+    switch (targetType_) {
+        case TargetType::ELEMENT:     return "@Element";
+        case TargetType::STYLE:       return "@Style";
+        case TargetType::VAR:         return "@Var";
+        case TargetType::PROPERTY:    return "property";
+        case TargetType::CHILD:       return "child";
+        case TargetType::INHERITANCE: return "inheritance";
+        default:                      return "unknown";
+    }
 }
 
 // FromOperatorNode实现
 FromOperatorNode::FromOperatorNode(const NodePosition& position)
-    : OperatorNode(OperatorType::FROM, position) {
-    setNodeType(NodeType::FROM_OPERATOR);
+    : OperatorNode(OperatorType::FROM, NodeType::FROM_OPERATOR, position), 
+      sourceType_(SourceType::FILE), wildcardImport_(false) {
 }
 
 void FromOperatorNode::setSource(const std::string& source) {
@@ -290,14 +354,6 @@ void FromOperatorNode::setSource(const std::string& source) {
 
 std::string FromOperatorNode::getSource() const {
     return source_;
-}
-
-bool FromOperatorNode::hasSource() const {
-    return !source_.empty();
-}
-
-void FromOperatorNode::clearSource() {
-    source_.clear();
 }
 
 void FromOperatorNode::setSourceType(SourceType type) {
@@ -318,36 +374,42 @@ void FromOperatorNode::removeImportItem(const std::string& item) {
     importItems_.erase(std::remove(importItems_.begin(), importItems_.end(), item), importItems_.end());
 }
 
-const std::vector<std::string>& FromOperatorNode::getImportItems() const {
+std::vector<std::string> FromOperatorNode::getImportItems() const {
     return importItems_;
 }
 
-void FromOperatorNode::clearImportItems() {
-    importItems_.clear();
+bool FromOperatorNode::hasImportItems() const {
+    return !importItems_.empty();
 }
 
-bool FromOperatorNode::hasImportItem(const std::string& item) const {
-    return std::find(importItems_.begin(), importItems_.end(), item) != importItems_.end();
+void FromOperatorNode::setWildcardImport(bool wildcard) {
+    wildcardImport_ = wildcard;
+}
+
+bool FromOperatorNode::isWildcardImport() const {
+    return wildcardImport_;
 }
 
 bool FromOperatorNode::validate() const {
     if (!OperatorNode::validate()) {
         return false;
     }
-    
-    // from操作符需要有源
     return !source_.empty();
 }
 
 std::string FromOperatorNode::toString() const {
     std::stringstream ss;
+    
     if (!importItems_.empty()) {
         for (size_t i = 0; i < importItems_.size(); ++i) {
             if (i > 0) ss << ", ";
             ss << importItems_[i];
         }
         ss << " ";
+    } else if (wildcardImport_) {
+        ss << "* ";
     }
+    
     ss << "from " << source_;
     return ss.str();
 }
@@ -357,7 +419,8 @@ std::string FromOperatorNode::toDebugString(int indent) const {
     std::stringstream ss;
     ss << indentStr << "FromOperatorNode {" << std::endl;
     ss << indentStr << "  source: " << source_ << std::endl;
-    ss << indentStr << "  sourceType: " << static_cast<int>(sourceType_) << std::endl;
+    ss << indentStr << "  sourceType: " << sourceTypeToString() << std::endl;
+    ss << indentStr << "  wildcardImport: " << (wildcardImport_ ? "true" : "false") << std::endl;
     
     if (!importItems_.empty()) {
         ss << indentStr << "  importItems: [";
@@ -368,7 +431,7 @@ std::string FromOperatorNode::toDebugString(int indent) const {
         ss << "]" << std::endl;
     }
     
-    ss << indentStr << "  position: [" << getPosition().line << ":" << getPosition().column << "]" << std::endl;
+    ss << indentStr << "  position: " << getPosition().toString() << std::endl;
     ss << indentStr << "}";
     return ss.str();
 }
@@ -378,17 +441,35 @@ std::shared_ptr<Node> FromOperatorNode::clone() const {
     cloned->source_ = source_;
     cloned->sourceType_ = sourceType_;
     cloned->importItems_ = importItems_;
+    cloned->wildcardImport_ = wildcardImport_;
     return cloned;
 }
 
 void FromOperatorNode::accept(NodeVisitor& visitor) {
-    visitor.visit(*this);
+    (void)visitor; // 暂时空实现
+}
+
+std::string FromOperatorNode::sourceTypeToString() const {
+    switch (sourceType_) {
+        case SourceType::FILE:    return "file";
+        case SourceType::MODULE:  return "module";
+        case SourceType::URL:     return "url";
+        case SourceType::LIBRARY: return "library";
+        default:                  return "unknown";
+    }
 }
 
 // AsOperatorNode实现
 AsOperatorNode::AsOperatorNode(const NodePosition& position)
-    : OperatorNode(OperatorType::AS, position) {
-    setNodeType(NodeType::AS_OPERATOR);
+    : OperatorNode(OperatorType::AS, NodeType::AS_OPERATOR, position), hasScope_(false) {
+}
+
+void AsOperatorNode::setOriginalName(const std::string& originalName) {
+    originalName_ = originalName;
+}
+
+std::string AsOperatorNode::getOriginalName() const {
+    return originalName_;
 }
 
 void AsOperatorNode::setAlias(const std::string& alias) {
@@ -397,26 +478,6 @@ void AsOperatorNode::setAlias(const std::string& alias) {
 
 std::string AsOperatorNode::getAlias() const {
     return alias_;
-}
-
-bool AsOperatorNode::hasAlias() const {
-    return !alias_.empty();
-}
-
-void AsOperatorNode::clearAlias() {
-    alias_.clear();
-}
-
-void AsOperatorNode::setOriginalName(const std::string& original) {
-    originalName_ = original;
-}
-
-std::string AsOperatorNode::getOriginalName() const {
-    return originalName_;
-}
-
-bool AsOperatorNode::hasOriginalName() const {
-    return !originalName_.empty();
 }
 
 void AsOperatorNode::setScope(const std::string& scope) {
@@ -436,8 +497,6 @@ bool AsOperatorNode::validate() const {
     if (!OperatorNode::validate()) {
         return false;
     }
-    
-    // as操作符需要有别名
     return !alias_.empty();
 }
 
@@ -469,28 +528,28 @@ std::string AsOperatorNode::toDebugString(int indent) const {
         ss << indentStr << "  scope: " << scope_ << std::endl;
     }
     
-    ss << indentStr << "  position: [" << getPosition().line << ":" << getPosition().column << "]" << std::endl;
+    ss << indentStr << "  position: " << getPosition().toString() << std::endl;
     ss << indentStr << "}";
     return ss.str();
 }
 
 std::shared_ptr<Node> AsOperatorNode::clone() const {
     auto cloned = std::make_shared<AsOperatorNode>(getPosition());
-    cloned->alias_ = alias_;
     cloned->originalName_ = originalName_;
+    cloned->alias_ = alias_;
     cloned->scope_ = scope_;
     cloned->hasScope_ = hasScope_;
     return cloned;
 }
 
 void AsOperatorNode::accept(NodeVisitor& visitor) {
-    visitor.visit(*this);
+    (void)visitor; // 暂时空实现
 }
 
 // InheritOperatorNode实现
 InheritOperatorNode::InheritOperatorNode(const NodePosition& position)
-    : OperatorNode(OperatorType::INHERIT, position), inheritType_(InheritType::ELEMENT), inheritMode_(InheritMode::DIRECT) {
-    setNodeType(NodeType::INHERIT_OPERATOR);
+    : OperatorNode(OperatorType::INHERIT, NodeType::INHERIT_OPERATOR, position), 
+      inheritType_(InheritType::ELEMENT), inheritMode_(InheritMode::DIRECT) {
 }
 
 void InheritOperatorNode::setTarget(const std::string& target) {
@@ -535,32 +594,17 @@ bool InheritOperatorNode::validate() const {
     if (!OperatorNode::validate()) {
         return false;
     }
-    
-    // inherit操作符需要有目标
     return !target_.empty();
 }
 
 std::string InheritOperatorNode::toString() const {
     std::stringstream ss;
-    ss << "inherit ";
+    ss << "inherit " << inheritTypeToString() << " " << target_;
     
-    // 继承类型
-    switch (inheritType_) {
-        case InheritType::ELEMENT:  ss << "@Element "; break;
-        case InheritType::STYLE:    ss << "@Style "; break;
-        case InheritType::VAR:      ss << "@Var "; break;
-        case InheritType::TEMPLATE: ss << "@Template "; break;
-        case InheritType::CUSTOM:   ss << "@Custom "; break;
-    }
-    
-    ss << target_;
-    
-    // 继承模式
     if (inheritMode_ != InheritMode::DIRECT) {
         ss << " (" << inheritModeToString() << ")";
     }
     
-    // 条件
     if (!conditions_.empty()) {
         ss << " where ";
         for (size_t i = 0; i < conditions_.size(); ++i) {
@@ -589,7 +633,7 @@ std::string InheritOperatorNode::toDebugString(int indent) const {
         ss << "]" << std::endl;
     }
     
-    ss << indentStr << "  position: [" << getPosition().line << ":" << getPosition().column << "]" << std::endl;
+    ss << indentStr << "  position: " << getPosition().toString() << std::endl;
     ss << indentStr << "}";
     return ss.str();
 }
@@ -604,17 +648,17 @@ std::shared_ptr<Node> InheritOperatorNode::clone() const {
 }
 
 void InheritOperatorNode::accept(NodeVisitor& visitor) {
-    visitor.visit(*this);
+    (void)visitor; // 暂时空实现
 }
 
 std::string InheritOperatorNode::inheritTypeToString() const {
     switch (inheritType_) {
-        case InheritType::ELEMENT:  return "Element";
-        case InheritType::STYLE:    return "Style";
-        case InheritType::VAR:      return "Var";
-        case InheritType::TEMPLATE: return "Template";
-        case InheritType::CUSTOM:   return "Custom";
-        default:                    return "Unknown";
+        case InheritType::ELEMENT:  return "@Element";
+        case InheritType::STYLE:    return "@Style";
+        case InheritType::VAR:      return "@Var";
+        case InheritType::TEMPLATE: return "@Template";
+        case InheritType::CUSTOM:   return "@Custom";
+        default:                    return "unknown";
     }
 }
 
