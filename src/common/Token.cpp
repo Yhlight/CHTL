@@ -33,6 +33,10 @@ const std::map<TokenType, std::string> tokenTypeToString = {
     {TokenType::AT, "AT"},
     {TokenType::AMPERSAND, "AMPERSAND"},
     {TokenType::COMMA, "COMMA"},
+    {TokenType::SLASH, "SLASH"},
+    {TokenType::ASTERISK, "ASTERISK"},
+    {TokenType::STRING, "STRING"},
+    {TokenType::COMMENT, "COMMENT"},
     
     // 基础关键字
     {TokenType::KEYWORD_TEXT, "KEYWORD_TEXT"},

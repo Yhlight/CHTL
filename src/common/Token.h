@@ -38,6 +38,12 @@ enum class TokenType {
     AT,                  // @
     AMPERSAND,           // &
     COMMA,               // ,
+    SLASH,               // /
+    ASTERISK,            // *
+    
+    // 字面量
+    STRING,              // 字符串字面量
+    COMMENT,             // 注释
     
     // 基础关键字
     KEYWORD_TEXT,        // text

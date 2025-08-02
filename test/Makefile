@@ -3,12 +3,13 @@ CXXFLAGS = -std=c++14 -Wall -g
 INCLUDES = -I../src
 
 # 目标可执行文件
-TARGETS = TokenTest LexerTest LoaderTest
+TARGETS = TokenTest LexerTest LoaderTest ParserTest
 
 # 源文件
 COMMON_SRC = ../src/common/Token.cpp
 LEXER_SRC = ../src/lexer/Lexer.cpp ../src/lexer/BasicLexer.cpp ../src/lexer/ConfigLexer.cpp
 LOADER_SRC = ../src/loader/ChtlLoader.cpp
+PARSER_SRC = ../src/parser/Parser.cpp ../src/parser/BasicParser.cpp
 
 all: $(TARGETS)
 
@@ -21,6 +22,9 @@ LexerTest: LexerTest.cpp $(COMMON_SRC) $(LEXER_SRC)
 LoaderTest: LoaderTest.cpp $(LOADER_SRC)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+ParserTest: ParserTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 test: $(TARGETS)
 	@echo "Running Token Tests..."
 	./TokenTest
@@ -28,6 +32,8 @@ test: $(TARGETS)
 	./LexerTest
 	@echo "\nRunning Loader Tests..."
 	./LoaderTest
+	@echo "\nRunning Parser Tests..."
+	./ParserTest
 
 clean:
 	rm -f $(TARGETS) *.o

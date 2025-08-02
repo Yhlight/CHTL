@@ -178,11 +178,21 @@ void BasicLexer::handleNormalState() {
                 return;
             }
             break;
-        case ',':
-            advance();
-            addToken(TokenType::COMMA, ",");
-            return;
-    }
+                        case ',':
+                    advance();
+                    addToken(TokenType::COMMA, ",");
+                    return;
+                    
+                case '/':
+                    advance();
+                    addToken(TokenType::SLASH, "/");
+                    return;
+                    
+                case '*':
+                    advance();
+                    addToken(TokenType::ASTERISK, "*");
+                    return;
+            }
     
     // 处理数字
     if (isDigit(ch)) {

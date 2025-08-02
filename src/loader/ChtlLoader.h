@@ -68,7 +68,6 @@ private:
     std::string getAbsolutePath(const std::string& path, const std::string& basePath) const;
     std::string getDirectoryPath(const std::string& filePath) const;
     std::string getFileName(const std::string& filePath) const;
-    std::string getFileExtension(const std::string& filePath) const;
     
 public:
     // 路径规范化：处理 . 代替 / 的情况
@@ -76,6 +75,7 @@ public:
     
     // 路径处理（公开给测试使用）
     std::string normalizePath(const std::string& path) const;
+    std::string getFileExtension(const std::string& filePath) const;
     
 private:
     
