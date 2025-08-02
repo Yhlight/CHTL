@@ -5,7 +5,6 @@
 #include "../node/StyleNode.h"
 #include "../node/Custom.h"
 #include "../node/Template.h"
-#include "../node/Style.h"
 #include "../node/Operator.h"
 #include "../node/Import.h"
 #include "../node/Namespace.h"
@@ -137,7 +136,7 @@ protected:
     std::shared_ptr<TemplateVarNode> parseTemplateVar();
     
     // 变量和调用解析
-    std::shared_ptr<VariableCallNode> parseVariableCall();
+    std::shared_ptr<CustomVariableCallNode> parseVariableCall();
     std::shared_ptr<Node> parseStyleGroupCall();
     
     // 配置解析
@@ -169,7 +168,7 @@ protected:
     virtual bool shouldTreatAsStyleGroup(const std::string& identifier) const;
     virtual bool shouldTreatAsVariable(const std::string& identifier) const;
     
-private:
+protected:
     // Token流
     std::vector<Token> tokens_;
     size_t current_;
