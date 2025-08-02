@@ -10,6 +10,7 @@
 #include "../node/Import.h"
 #include "../node/Namespace.h"
 #include "../node/Config.h"
+#include "../node/Origin.h"
 #include <vector>
 #include <stack>
 #include <memory>

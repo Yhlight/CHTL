@@ -179,14 +179,14 @@ private:
 };
 
 /**
- * 变量调用节点
- * 表示变量组调用，如ThemeColor(primary)
+ * 自定义变量调用节点
+ * 表示自定义变量组调用，如ThemeColor(primary)
  */
-class VariableCallNode : public Node {
+class CustomVariableCallNode : public Node {
 public:
-    explicit VariableCallNode(const std::string& varGroupName = "",
-                             const NodePosition& position = NodePosition());
-    virtual ~VariableCallNode() = default;
+        explicit CustomVariableCallNode(const std::string& varGroupName = "",
+                                    const NodePosition& position = NodePosition());
+    virtual ~CustomVariableCallNode() = default;
     
     // 变量组名称
     const std::string& getVarGroupName() const;

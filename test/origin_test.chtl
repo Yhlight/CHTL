@@ -1,0 +1,149 @@
+// CHTL原始嵌入系统测试文件
+
+html
+{
+    head
+    {
+        title { "CHTL原始嵌入测试" }
+        
+        // 原始CSS嵌入
+        [Origin] @Style
+        {
+            body {
+                margin: 0;
+                padding: 20px;
+                font-family: 'Arial', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                padding: 30px;
+            }
+            
+            .highlight {
+                background: #ffeb3b;
+                padding: 2px 5px;
+                border-radius: 3px;
+            }
+            
+            @media (max-width: 768px) {
+                .container {
+                    margin: 10px;
+                    padding: 15px;
+                }
+            }
+        }
+    }
+    
+    body
+    {
+        div { class: "container";
+            
+            h1 { "原始嵌入功能演示" }
+            
+            // 原始HTML嵌入
+            [Origin] @Html
+            {
+                <section class="demo-section">
+                    <h2>直接嵌入的HTML内容</h2>
+                    <p>这段内容是通过 <span class="highlight">[Origin] @Html</span> 直接嵌入的原始HTML代码。</p>
+                    <ul>
+                        <li>支持完整的HTML标签</li>
+                        <li>保留原始的HTML结构</li>
+                        <li>可以包含复杂的嵌套</li>
+                    </ul>
+                    
+                    <div class="info-box" style="border: 2px solid #2196F3; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <strong>注意：</strong> 原始HTML嵌入允许你直接使用现有的HTML代码，
+                        而不需要转换为CHTL语法。
+                    </div>
+                </section>
+            }
+            
+            // 原始JavaScript嵌入
+            [Origin] @JavaScript
+            {
+                // 页面交互功能
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log('CHTL页面加载完成');
+                    
+                    // 添加点击效果
+                    const highlights = document.querySelectorAll('.highlight');
+                    highlights.forEach(function(element) {
+                        element.addEventListener('click', function() {
+                            this.style.backgroundColor = this.style.backgroundColor === 'rgb(76, 175, 80)' 
+                                ? '#ffeb3b' 
+                                : '#4CAF50';
+                        });
+                    });
+                    
+                    // 动态内容生成
+                    const demoSection = document.querySelector('.demo-section');
+                    if (demoSection) {
+                        const timeElement = document.createElement('p');
+                        timeElement.innerHTML = '<strong>页面生成时间：</strong> ' + new Date().toLocaleString();
+                        timeElement.style.cssText = 'text-align: center; color: #666; margin-top: 30px; padding: 10px; background: #f5f5f5; border-radius: 5px;';
+                        demoSection.appendChild(timeElement);
+                    }
+                    
+                    // 简单的响应式检测
+                    function checkScreenSize() {
+                        const width = window.innerWidth;
+                        const indicator = document.getElementById('screen-indicator') || document.createElement('div');
+                        indicator.id = 'screen-indicator';
+                        indicator.style.cssText = 'position: fixed; top: 10px; right: 10px; background: #333; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; z-index: 1000;';
+                        
+                        if (width <= 768) {
+                            indicator.textContent = '移动设备 (' + width + 'px)';
+                        } else if (width <= 1024) {
+                            indicator.textContent = '平板设备 (' + width + 'px)';
+                        } else {
+                            indicator.textContent = '桌面设备 (' + width + 'px)';
+                        }
+                        
+                        if (!document.body.contains(indicator)) {
+                            document.body.appendChild(indicator);
+                        }
+                    }
+                    
+                    checkScreenSize();
+                    window.addEventListener('resize', checkScreenSize);
+                });
+            }
+            
+            // CHTL样式与原始嵌入混合使用
+            div {
+                style {
+                    margin-top: 30px;
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                }
+                
+                h3 { "混合模式演示" }
+                p { "这个区域使用CHTL原生样式语法，与上面的原始嵌入内容形成对比。" }
+                
+                button {
+                    text { "点击测试" }
+                    style {
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 16px;
+                    }
+                    
+                    // JavaScript事件处理也可以混合使用
+                    onclick: "alert('CHTL按钮被点击了！');"
+                }
+            }
+        }
+    }
+}
