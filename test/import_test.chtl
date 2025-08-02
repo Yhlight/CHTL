@@ -1,0 +1,92 @@
+// CHTL导入系统测试文件
+
+// 导入布局模块
+[Import] layout from layout;
+
+// 导入组件模块的特定组件
+[Import] Button, Card, FormInput from components;
+
+// 导入工具模块并设置别名
+[Import] UtilityStyles from utils as Utils;
+
+html {
+    head {
+        title { "Import测试页面" }
+        
+        // 直接使用导入的样式
+        style {
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+            }
+        }
+    }
+    
+    body {
+        // 使用导入的布局元素
+        Container {
+            Header {
+                h1 { "模块导入演示" }
+                p { "这个页面演示了CHTL的模块导入功能" }
+            }
+            
+            Main {
+                FlexRow {
+                    Grid2 {
+                        Card {
+                            CardHeader { "按钮示例" }
+                            CardBody {
+                                Button { "主要按钮" }
+                                " "
+                                Button { 
+                                    text { "次要按钮" }
+                                    class: "secondary"
+                                }
+                            }
+                        }
+                        
+                        Card {
+                            CardHeader { "表单示例" }
+                            CardBody {
+                                FormGroup {
+                                    FormLabel { "用户名:" }
+                                    FormInput { placeholder: "请输入用户名" }
+                                }
+                                
+                                FormGroup {
+                                    FormLabel { "邮箱:" }
+                                    FormInput { 
+                                        type: "email"
+                                        placeholder: "请输入邮箱地址"
+                                    }
+                                }
+                                
+                                Button { 
+                                    text { "提交" }
+                                    type: "submit"
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 使用工具类
+                div {
+                    class: "margin-4 padding-3";
+                    style: Utils.text-center + Utils.border + Utils.rounded;
+                    
+                    h3 { "工具类演示" }
+                    p { 
+                        text { "这个区域使用了导入的工具样式类" }
+                        style: Utils.text-lg + Utils.text-primary;
+                    }
+                }
+            }
+            
+            Footer {
+                p { "© 2024 CHTL模块系统演示" }
+            }
+        }
+    }
+}

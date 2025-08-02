@@ -1,0 +1,129 @@
+// CHTL布局模块 - 提供常用的布局元素和样式
+
+[Custom] @Style LayoutStyles
+{
+    // 容器样式
+    container: {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    // Flexbox布局
+    flex-row: {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    flex-column: {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    flex-center: {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    // Grid布局
+    grid-2: {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    grid-3: {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    grid-4: {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    
+    // 响应式
+    mobile-hidden: {
+        @media (max-width: 768px) {
+            display: none;
+        }
+    }
+    
+    desktop-hidden: {
+        @media (min-width: 769px) {
+            display: none;
+        }
+    }
+}
+
+[Custom] @Element LayoutElements
+{
+    // 容器元素
+    Container: div {
+        class: "container";
+        style: LayoutStyles.container;
+    }
+    
+    // Flex容器
+    FlexRow: div {
+        class: "flex-row";
+        style: LayoutStyles.flex-row;
+    }
+    
+    FlexColumn: div {
+        class: "flex-column";
+        style: LayoutStyles.flex-column;
+    }
+    
+    FlexCenter: div {
+        class: "flex-center";
+        style: LayoutStyles.flex-center;
+    }
+    
+    // Grid容器
+    Grid2: div {
+        class: "grid-2";
+        style: LayoutStyles.grid-2;
+    }
+    
+    Grid3: div {
+        class: "grid-3";
+        style: LayoutStyles.grid-3;
+    }
+    
+    Grid4: div {
+        class: "grid-4";
+        style: LayoutStyles.grid-4;
+    }
+    
+    // 常用结构
+    Header: header {
+        class: "site-header";
+        style: {
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+    }
+    
+    Footer: footer {
+        class: "site-footer";
+        style: {
+            padding: 40px 0;
+            margin-top: 60px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+    }
+    
+    Main: main {
+        class: "main-content";
+        style: {
+            min-height: 500px;
+            padding: 40px 0;
+        }
+    }
+}

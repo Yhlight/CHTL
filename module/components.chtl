@@ -1,0 +1,206 @@
+// CHTL组件模块 - 提供常用的UI组件
+
+[Custom] @Style ComponentStyles
+{
+    // 按钮样式
+    btn-base: {
+        display: inline-block;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+    
+    btn-primary: {
+        background: #007bff;
+        color: white;
+    }
+    
+    btn-secondary: {
+        background: #6c757d;
+        color: white;
+    }
+    
+    btn-success: {
+        background: #28a745;
+        color: white;
+    }
+    
+    btn-danger: {
+        background: #dc3545;
+        color: white;
+    }
+    
+    // 卡片样式
+    card: {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    card-header: {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        font-weight: bold;
+    }
+    
+    card-body: {
+        padding: 20px;
+    }
+    
+    card-footer: {
+        padding: 15px 20px;
+        border-top: 1px solid #eee;
+        background: #f8f9fa;
+    }
+    
+    // 表单样式
+    form-group: {
+        margin-bottom: 15px;
+    }
+    
+    form-label: {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    form-input: {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    
+    // 导航样式
+    navbar: {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+    }
+    
+    nav-brand: {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+    }
+    
+    nav-menu: {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    nav-item: {
+        margin-left: 20px;
+    }
+    
+    nav-link: {
+        color: #333;
+        text-decoration: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s ease;
+    }
+}
+
+[Custom] @Element Components
+{
+    // 按钮组件
+    Button: button {
+        style: ComponentStyles.btn-base + ComponentStyles.btn-primary;
+    }
+    
+    SecondaryButton: button {
+        style: ComponentStyles.btn-base + ComponentStyles.btn-secondary;
+    }
+    
+    SuccessButton: button {
+        style: ComponentStyles.btn-base + ComponentStyles.btn-success;
+    }
+    
+    DangerButton: button {
+        style: ComponentStyles.btn-base + ComponentStyles.btn-danger;
+    }
+    
+    // 卡片组件
+    Card: div {
+        class: "card";
+        style: ComponentStyles.card;
+    }
+    
+    CardHeader: div {
+        class: "card-header";
+        style: ComponentStyles.card-header;
+    }
+    
+    CardBody: div {
+        class: "card-body";
+        style: ComponentStyles.card-body;
+    }
+    
+    CardFooter: div {
+        class: "card-footer";
+        style: ComponentStyles.card-footer;
+    }
+    
+    // 表单组件
+    FormGroup: div {
+        class: "form-group";
+        style: ComponentStyles.form-group;
+    }
+    
+    FormLabel: label {
+        class: "form-label";
+        style: ComponentStyles.form-label;
+    }
+    
+    FormInput: input {
+        class: "form-input";
+        style: ComponentStyles.form-input;
+        type: "text";
+    }
+    
+    FormTextarea: textarea {
+        class: "form-input";
+        style: ComponentStyles.form-input;
+    }
+    
+    // 导航组件
+    Navbar: nav {
+        class: "navbar";
+        style: ComponentStyles.navbar;
+    }
+    
+    NavBrand: a {
+        class: "nav-brand";
+        style: ComponentStyles.nav-brand;
+    }
+    
+    NavMenu: ul {
+        class: "nav-menu";
+        style: ComponentStyles.nav-menu;
+    }
+    
+    NavItem: li {
+        class: "nav-item";
+        style: ComponentStyles.nav-item;
+    }
+    
+    NavLink: a {
+        class: "nav-link";
+        style: ComponentStyles.nav-link;
+    }
+}
