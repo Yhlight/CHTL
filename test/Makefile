@@ -3,13 +3,17 @@ CXXFLAGS = -std=c++14 -Wall -g
 INCLUDES = -I../src
 
 # 目标可执行文件
-TARGETS = TokenTest LexerTest LoaderTest ParserTest ParserAdvancedTest ConfigParserTest ConfigParserOptimizedTest
+TARGETS = TokenTest LexerTest LoaderTest ParserTest ParserAdvancedTest ConfigParserTest ConfigParserOptimizedTest RegistryTest
 
 # 源文件
 COMMON_SRC = ../src/common/Token.cpp
 LEXER_SRC = ../src/lexer/Lexer.cpp ../src/lexer/BasicLexer.cpp ../src/lexer/ConfigLexer.cpp
 LOADER_SRC = ../src/loader/ChtlLoader.cpp
 PARSER_SRC = ../src/parser/Parser.cpp ../src/parser/BasicParser.cpp ../src/parser/ConfigParser.cpp
+PREDEFINE_SRC = ../src/predefine/Registry.cpp ../src/predefine/PredefinedParser.cpp \
+                ../src/predefine/PredefinedCustomStyles.cpp ../src/predefine/PredefinedCustomElements.cpp \
+                ../src/predefine/PredefinedCustomVariables.cpp ../src/predefine/PredefinedTemplateStyles.cpp \
+                ../src/predefine/PredefinedTemplateElements.cpp ../src/predefine/PredefinedTemplateVariables.cpp
 
 all: $(TARGETS)
 
@@ -34,6 +38,9 @@ ConfigParserTest: ConfigParserTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) 
 ConfigParserOptimizedTest: ConfigParserOptimizedTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+RegistryTest: RegistryTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC) $(PREDEFINE_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 test: $(TARGETS)
 	@echo "Running Token Tests..."
 	./TokenTest
@@ -49,6 +56,8 @@ test: $(TARGETS)
 	./ConfigParserTest
 	@echo "\nRunning Config Parser Optimized Tests..."
 	./ConfigParserOptimizedTest
+	@echo "\nRunning Registry Tests..."
+	./RegistryTest
 
 clean:
 	rm -f $(TARGETS) *.o
