@@ -85,6 +85,14 @@ enum class TokenType {
     
     // 索引访问
     INDEX_ACCESS,        // [数字]
+    
+    // 布尔值
+    KEYWORD_TRUE,        // true
+    KEYWORD_FALSE,       // false
+    
+    // 其他Token
+    WHITESPACE,          // 空白
+    NEWLINE,             // 换行
 };
 
 // Token结构体

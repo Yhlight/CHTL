@@ -53,6 +53,9 @@ protected:
     std::string parseImportPath();
     void processImport(ImportNode* importNode);
     
+    // 解析配置相关
+    NodePtr parseConfigurationItem();
+    
     // 解析变量组和样式组
     void parseVarGroupContent(CustomVarNode* varNode);
     void parseStyleGroupContent(StyleGroupNode* styleGroup);

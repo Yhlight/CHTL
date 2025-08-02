@@ -78,6 +78,14 @@ const std::map<TokenType, std::string> tokenTypeToString = {
     
     // 索引访问
     {TokenType::INDEX_ACCESS, "INDEX_ACCESS"},
+    
+    // 布尔值
+    {TokenType::KEYWORD_TRUE, "KEYWORD_TRUE"},
+    {TokenType::KEYWORD_FALSE, "KEYWORD_FALSE"},
+    
+    // 其他Token
+    {TokenType::WHITESPACE, "WHITESPACE"},
+    {TokenType::NEWLINE, "NEWLINE"},
 };
 
 // 基础关键字到Token类型的映射
@@ -94,6 +102,8 @@ const std::map<std::string, TokenType> keywordToTokenType = {
     {"from", TokenType::KEYWORD_FROM},
     {"as", TokenType::KEYWORD_AS},
     {"inherit", TokenType::KEYWORD_INHERIT},
+    {"true", TokenType::KEYWORD_TRUE},
+    {"false", TokenType::KEYWORD_FALSE},
     
     // 配置关键字（方括号组合）
     {"[Custom]", TokenType::KEYWORD_CUSTOM},
