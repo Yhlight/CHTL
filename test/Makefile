@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++14 -Wall -g
 INCLUDES = -I../src
 
 # 目标可执行文件
-TARGETS = TokenTest LexerTest LoaderTest ParserTest ParserAdvancedTest ConfigParserTest ConfigParserOptimizedTest RegistryTest
+TARGETS = TokenTest LexerTest LoaderTest ParserTest ParserAdvancedTest ConfigParserTest ConfigParserOptimizedTest RegistryTest GeneratorTest
 
 # 源文件
 COMMON_SRC = ../src/common/Token.cpp
@@ -14,6 +14,7 @@ PREDEFINE_SRC = ../src/predefine/Registry.cpp ../src/predefine/PredefinedParser.
                 ../src/predefine/PredefinedCustomStyles.cpp ../src/predefine/PredefinedCustomElements.cpp \
                 ../src/predefine/PredefinedCustomVariables.cpp ../src/predefine/PredefinedTemplateStyles.cpp \
                 ../src/predefine/PredefinedTemplateElements.cpp ../src/predefine/PredefinedTemplateVariables.cpp
+GENERATOR_SRC = ../src/generator/Generator.cpp ../src/generator/HtmlGenerator.cpp
 
 all: $(TARGETS)
 
@@ -41,6 +42,9 @@ ConfigParserOptimizedTest: ConfigParserOptimizedTest.cpp $(COMMON_SRC) $(LEXER_S
 RegistryTest: RegistryTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC) $(PREDEFINE_SRC)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+GeneratorTest: GeneratorTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC) $(PREDEFINE_SRC) $(GENERATOR_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 test: $(TARGETS)
 	@echo "Running Token Tests..."
 	./TokenTest
@@ -58,6 +62,8 @@ test: $(TARGETS)
 	./ConfigParserOptimizedTest
 	@echo "\nRunning Registry Tests..."
 	./RegistryTest
+	@echo "\nRunning Generator Tests..."
+	./GeneratorTest
 
 clean:
 	rm -f $(TARGETS) *.o
