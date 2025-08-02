@@ -2,9 +2,13 @@
 #include "../common/Token.h"
 #include "../common/Context.h"
 #include "../node/Node.h"
-#include "../node/ElementNode.h"
 #include "../node/StyleNode.h"
-#include "../node/CustomNode.h"
+#include "../node/Custom.h"
+#include "../node/Template.h"
+#include "../node/Style.h"
+#include "../node/Operator.h"
+#include "../node/Import.h"
+#include "../node/Namespace.h"
 #include <vector>
 #include <stack>
 #include <memory>

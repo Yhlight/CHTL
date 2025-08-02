@@ -1,7 +1,5 @@
 #include "../src/node/Node.h"
-#include "../src/node/ElementNode.h"
 #include "../src/node/StyleNode.h"
-#include "../src/node/CustomNode.h"
 #include <iostream>
 #include <cassert>
 
