@@ -1,5 +1,7 @@
 #include "Import.h"
+#include "Operator.h"
 #include <sstream>
+#include <algorithm>
 #include <algorithm>
 
 namespace chtl {
@@ -55,8 +57,61 @@ bool ImportNode::hasAsOperator() const {
     return asOperator_ != nullptr;
 }
 
-std::vector<std::string> ImportNode::getImportItems() const {
-    return std::vector<std::string>(importItems_.begin(), importItems_.end());
+const std::vector<std::string>& ImportNode::getImportItems() const {
+    return importItems_;
+}
+
+void ImportNode::addImportItem(const std::string& item) {
+    if (std::find(importItems_.begin(), importItems_.end(), item) == importItems_.end()) {
+        importItems_.push_back(item);
+    }
+}
+
+void ImportNode::removeImportItem(const std::string& item) {
+    importItems_.erase(std::remove(importItems_.begin(), importItems_.end(), item), importItems_.end());
+}
+
+void ImportNode::clearImportItems() {
+    importItems_.clear();
+}
+
+bool ImportNode::hasImportItem(const std::string& item) const {
+    return std::find(importItems_.begin(), importItems_.end(), item) != importItems_.end();
+}
+
+void ImportNode::addImportItems(const std::vector<std::string>& items) {
+    for (const auto& item : items) {
+        addImportItem(item);
+    }
+}
+
+bool ImportNode::isWildcardImport() const {
+    return std::find(importItems_.begin(), importItems_.end(), "*") != importItems_.end();
+}
+
+bool ImportNode::isSelectiveImport() const {
+    return !importItems_.empty() && !isWildcardImport();
+}
+
+std::string ImportNode::getSourceFile() const {
+    return fromOperator_ ? fromOperator_->getSource() : "";
+}
+
+std::string ImportNode::getAlias() const {
+    return asOperator_ ? asOperator_->getAlias() : "";
+}
+
+bool ImportNode::hasAlias() const {
+    return asOperator_ && asOperator_->hasAlias();
+}
+
+void ImportNode::setWildcardImport(bool wildcard) {
+    if (wildcard) {
+        importItems_.clear();
+        importItems_.push_back("*");
+    } else {
+        importItems_.erase(std::remove(importItems_.begin(), importItems_.end(), "*"), importItems_.end());
+    }
 }
 
 bool ImportNode::validate() const {
