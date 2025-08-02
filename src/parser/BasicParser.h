@@ -9,6 +9,7 @@
 #include "../node/Operator.h"
 #include "../node/Import.h"
 #include "../node/Namespace.h"
+#include "../node/Config.h"
 #include <vector>
 #include <stack>
 #include <memory>
