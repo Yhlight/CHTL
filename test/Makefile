@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++14 -Wall -g
 INCLUDES = -I../src
 
 # 目标可执行文件
-TARGETS = TokenTest LexerTest LoaderTest ParserTest ParserAdvancedTest ConfigParserTest ConfigParserOptimizedTest RegistryTest GeneratorTest
+TARGETS = TokenTest LexerTest LoaderTest ParserTest ParserAdvancedTest ConfigParserTest ConfigParserOptimizedTest RegistryTest GeneratorTest GeneratorEnhancedTest
 
 # 源文件
 COMMON_SRC = ../src/common/Token.cpp
@@ -45,6 +45,9 @@ RegistryTest: RegistryTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER
 GeneratorTest: GeneratorTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC) $(PREDEFINE_SRC) $(GENERATOR_SRC)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+GeneratorEnhancedTest: GeneratorEnhancedTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC) $(PREDEFINE_SRC) $(GENERATOR_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 test: $(TARGETS)
 	@echo "Running Token Tests..."
 	./TokenTest
@@ -64,6 +67,8 @@ test: $(TARGETS)
 	./RegistryTest
 	@echo "\nRunning Generator Tests..."
 	./GeneratorTest
+	@echo "\nRunning Enhanced Selector Tests..."
+	./GeneratorEnhancedTest
 
 clean:
 	rm -f $(TARGETS) *.o

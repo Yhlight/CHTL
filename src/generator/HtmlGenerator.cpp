@@ -149,8 +149,39 @@ void HtmlGenerator::processStyleSelectors(StyleNode* styleNode, ElementNode* par
         }
         // 处理增强选择器（包含&）
         else if (selector.find('&') != std::string::npos) {
-            processAmpersandSelector(selector, parentElement);
-            generateStyleRule(rule.get());
+            // 根据上下文推导&的含义
+            std::string replacement;
+            
+            // 1. 优先使用已有的类名
+            if (!parentElement->getClasses().empty()) {
+                replacement = "." + *parentElement->getClasses().begin();
+            }
+            // 2. 其次使用ID
+            else if (!parentElement->getId().empty()) {
+                replacement = "#" + parentElement->getId();
+            }
+            // 3. 如果都没有，创建自动类名
+            else {
+                std::string autoClass = generateAutoClassName();
+                parentElement->addClass(autoClass);
+                replacement = "." + autoClass;
+            }
+            
+            // 创建新的规则，替换&
+            std::string newSelector = selector;
+            size_t pos = 0;
+            while ((pos = newSelector.find('&', pos)) != std::string::npos) {
+                newSelector.replace(pos, 1, replacement);
+                pos += replacement.length();
+            }
+            
+            // 创建新规则并复制属性
+            auto newRule = std::make_shared<StyleRuleNode>(newSelector, rule->getLine(), rule->getColumn());
+            for (const auto& prop : rule->getProperties()) {
+                newRule->addProperty(prop);
+            }
+            
+            generateStyleRule(newRule.get());
         }
         // 其他选择器直接生成
         else {
@@ -173,21 +204,35 @@ void HtmlGenerator::processStyleSelectors(StyleNode* styleNode, ElementNode* par
 }
 
 void HtmlGenerator::processAmpersandSelector(const std::string& selector, ElementNode* element) {
-    // 处理&选择器，需要生成自动类名
-    std::string autoClass = generateAutoClassName();
-    element->addClass(autoClass);
+    // 处理&选择器，根据上下文推导
+    std::string replacement;
     
-    // 替换&为生成的类名
+    // 1. 首先检查元素是否已有类名（通过class属性或.xxx选择器设置）
+    if (!element->getClasses().empty()) {
+        // 使用第一个类名，类名优先
+        replacement = "." + *element->getClasses().begin();
+    }
+    // 2. 其次检查是否有ID
+    else if (!element->getId().empty()) {
+        replacement = "#" + element->getId();
+    }
+    // 3. 如果都没有，创建一个自动类名
+    else {
+        std::string autoClass = generateAutoClassName();
+        element->addClass(autoClass);
+        replacement = "." + autoClass;
+    }
+    
+    // 替换&为推导出的选择器
     std::string newSelector = selector;
     size_t pos = 0;
     while ((pos = newSelector.find('&', pos)) != std::string::npos) {
-        newSelector.replace(pos, 1, "." + autoClass);
-        pos += autoClass.length() + 1;
+        newSelector.replace(pos, 1, replacement);
+        pos += replacement.length();
     }
     
-    // 创建新的规则
-    auto newRule = std::make_shared<StyleRuleNode>(newSelector, 0, 0);
-    // 这里需要复制原规则的属性...
+    // 更新选择器（这里需要找到对应的规则并更新）
+    // 注意：这里简化了实现，实际应该更新原规则的选择器
 }
 
 std::string HtmlGenerator::generateAutoClassName() {
