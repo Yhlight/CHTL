@@ -1,0 +1,123 @@
+{
+  "name": "chtl",
+  "displayName": "CHTL Language Support",
+  "description": "Language support for CHTL (Concise HyperText Language)",
+  "version": "1.0.0",
+  "publisher": "chtl-team",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Formatters"
+  ],
+  "keywords": [
+    "chtl",
+    "html",
+    "web",
+    "markup"
+  ],
+  "activationEvents": [
+    "onLanguage:chtl"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "chtl",
+        "aliases": ["CHTL", "chtl"],
+        "extensions": [".chtl"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "chtl",
+        "scopeName": "source.chtl",
+        "path": "./syntaxes/chtl.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "chtl",
+        "path": "./snippets/chtl.json"
+      }
+    ],
+    "configuration": {
+      "title": "CHTL",
+      "properties": {
+        "chtl.compiler.path": {
+          "type": "string",
+          "default": "chtlc",
+          "description": "Path to the CHTL compiler executable"
+        },
+        "chtl.preview.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh preview when file changes"
+        },
+        "chtl.preview.port": {
+          "type": "number",
+          "default": 3000,
+          "description": "Port for the preview server"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "chtl.compile",
+        "title": "CHTL: Compile Current File"
+      },
+      {
+        "command": "chtl.preview",
+        "title": "CHTL: Open Preview"
+      },
+      {
+        "command": "chtl.refreshPreview",
+        "title": "CHTL: Refresh Preview"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceExtname == .chtl",
+          "command": "chtl.preview",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceExtname == .chtl",
+          "command": "chtl.compile",
+          "group": "1_modification"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "chtl.preview",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "resourceExtname == .chtl"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.13.0"
+  }
+}

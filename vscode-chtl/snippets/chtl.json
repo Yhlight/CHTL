@@ -1,0 +1,190 @@
+{
+    "HTML Template": {
+        "prefix": "chtl",
+        "body": [
+            "html {",
+            "\thead {",
+            "\t\ttitle { text { \"$1\" } }",
+            "\t}",
+            "\tbody {",
+            "\t\t$0",
+            "\t}",
+            "}"
+        ],
+        "description": "Basic CHTL HTML template"
+    },
+    "Element with Style": {
+        "prefix": "divstyle",
+        "body": [
+            "div {",
+            "\tstyle {",
+            "\t\t.$1 {",
+            "\t\t\t$2",
+            "\t\t}",
+            "\t}",
+            "\t$0",
+            "}"
+        ],
+        "description": "Div element with style block"
+    },
+    "Custom Style": {
+        "prefix": "customstyle",
+        "body": [
+            "[Custom] @Style $1 {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Custom style definition"
+    },
+    "Custom Element": {
+        "prefix": "customelement",
+        "body": [
+            "[Custom] @Element $1 {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Custom element definition"
+    },
+    "Template Style": {
+        "prefix": "templatestyle",
+        "body": [
+            "[Template] @Style $1 {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Template style definition"
+    },
+    "Import": {
+        "prefix": "import",
+        "body": [
+            "[Import] \"$1\""
+        ],
+        "description": "Import statement"
+    },
+    "Configuration": {
+        "prefix": "config",
+        "body": [
+            "[Configuration] {",
+            "\t[Name] {",
+            "\t\ttext = $1;",
+            "\t\tstyle = $2;",
+            "\t}",
+            "}"
+        ],
+        "description": "Configuration block"
+    },
+    "Style Group": {
+        "prefix": "stylegroup",
+        "body": [
+            "@Style $1 {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Style group"
+    },
+    "Text Node": {
+        "prefix": "text",
+        "body": [
+            "text { \"$1\" }"
+        ],
+        "description": "Text node"
+    },
+    "Link": {
+        "prefix": "link",
+        "body": [
+            "a {",
+            "\thref: \"$1\";",
+            "\ttext { \"$2\" }",
+            "}"
+        ],
+        "description": "Link element"
+    },
+    "Image": {
+        "prefix": "img",
+        "body": [
+            "img {",
+            "\tsrc: \"$1\";",
+            "\talt: \"$2\";",
+            "}"
+        ],
+        "description": "Image element"
+    },
+    "Button": {
+        "prefix": "button",
+        "body": [
+            "button {",
+            "\ttype: \"$1\";",
+            "\ttext { \"$2\" }",
+            "}"
+        ],
+        "description": "Button element"
+    },
+    "Form": {
+        "prefix": "form",
+        "body": [
+            "form {",
+            "\taction: \"$1\";",
+            "\tmethod: \"$2\";",
+            "\t$0",
+            "}"
+        ],
+        "description": "Form element"
+    },
+    "Input": {
+        "prefix": "input",
+        "body": [
+            "input {",
+            "\ttype: \"$1\";",
+            "\tname: \"$2\";",
+            "\tplaceholder: \"$3\";",
+            "}"
+        ],
+        "description": "Input element"
+    },
+    "Hover Style": {
+        "prefix": "hover",
+        "body": [
+            "&:hover {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Hover pseudo-class"
+    },
+    "Responsive Style": {
+        "prefix": "responsive",
+        "body": [
+            "@Style $1 {",
+            "\t@media (max-width: 768px) {",
+            "\t\t$0",
+            "\t}",
+            "}"
+        ],
+        "description": "Responsive style with media query"
+    },
+    "Flex Container": {
+        "prefix": "flex",
+        "body": [
+            "style {",
+            "\t.$1 {",
+            "\t\tdisplay: \"flex\";",
+            "\t\tjustify-content: \"$2\";",
+            "\t\talign-items: \"$3\";",
+            "\t}",
+            "}"
+        ],
+        "description": "Flex container style"
+    },
+    "Grid Container": {
+        "prefix": "grid",
+        "body": [
+            "style {",
+            "\t.$1 {",
+            "\t\tdisplay: \"grid\";",
+            "\t\tgrid-template-columns: \"$2\";",
+            "\t\tgap: \"$3\";",
+            "\t}",
+            "}"
+        ],
+        "description": "Grid container style"
+    }
+}
