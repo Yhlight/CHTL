@@ -4,8 +4,26 @@
 #include "Node.h"
 #include <string>
 #include <vector>
+#include <map>
 
 namespace chtl {
+
+// 样式节点 - style { }
+class StyleNode : public Node {
+private:
+    bool isInline;  // 是否是内联样式（在元素内部）
+    
+public:
+    StyleNode(bool inline_style = false, int line = 0, int col = 0)
+        : Node(NodeType::STYLE_NODE, line, col), isInline(inline_style) {}
+    
+    bool getIsInline() const { return isInline; }
+    void setIsInline(bool value) { isInline = value; }
+    
+    std::string toString() const override {
+        return isInline ? "InlineStyleNode" : "StyleNode";
+    }
+};
 
 // CSS属性节点
 class StylePropertyNode : public Node {
@@ -38,12 +56,12 @@ class StyleSelectorNode : public Node {
 public:
     enum SelectorType {
         SELECTOR_ELEMENT,       // 元素选择器
-        SELECTOR_CLASS,         // 类选择器
-        SELECTOR_ID,            // ID选择器
-        SELECTOR_PSEUDO,        // 伪类选择器
-        SELECTOR_PSEUDO_ELEMENT, // 伪元素选择器
+        SELECTOR_CLASS,         // 类选择器 .className
+        SELECTOR_ID,            // ID选择器 #idName
+        SELECTOR_PSEUDO,        // 伪类选择器 :hover
+        SELECTOR_PSEUDO_ELEMENT, // 伪元素选择器 ::after
         SELECTOR_ATTRIBUTE,     // 属性选择器
-        SELECTOR_UNIVERSAL,     // 通用选择器
+        SELECTOR_UNIVERSAL,     // 通用选择器 *
         SELECTOR_AMPERSAND     // & 符号（上下文选择器）
     };
     
@@ -141,42 +159,6 @@ public:
     
     std::string toString() const override {
         return "StyleGroupNode: @Style " + groupName;
-    }
-};
-
-// 注释节点
-class CommentNode : public Node {
-public:
-    enum CommentType {
-        COMMENT_SINGLE_LINE,    // //
-        COMMENT_MULTI_LINE,     // /* */
-        COMMENT_GENERATOR       // --
-    };
-    
-private:
-    CommentType commentType;
-    std::string content;
-    
-public:
-    CommentNode(CommentType type, const std::string& text, 
-                int line = 0, int col = 0)
-        : Node(NodeType::COMMENT_NODE, line, col), 
-          commentType(type), content(text) {}
-    
-    CommentType getCommentType() const { return commentType; }
-    const std::string& getContent() const { return content; }
-    
-    void setCommentType(CommentType type) { commentType = type; }
-    void setContent(const std::string& text) { content = text; }
-    
-    std::string toString() const override {
-        std::string typeStr;
-        switch (commentType) {
-            case COMMENT_SINGLE_LINE: typeStr = "//"; break;
-            case COMMENT_MULTI_LINE: typeStr = "/**/"; break;
-            case COMMENT_GENERATOR: typeStr = "--"; break;
-        }
-        return "CommentNode(" + typeStr + "): " + content;
     }
 };
 

@@ -9,9 +9,16 @@
 #include <map>
 #include "../common/Token.h"
 #include "../node/Node.h"
+#include "../node/Comment.h"
+#include "../node/Origin.h"
 #include "../node/Custom.h"
+#include "../node/Template.h"
 #include "../node/Config.h"
 #include "../node/Style.h"
+#include "../node/Namespace.h"
+#include "../node/Import.h"
+#include "../node/Operator.h"
+#include "../node/Expect.h"
 
 namespace chtl {
 

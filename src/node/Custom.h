@@ -4,10 +4,11 @@
 #include "Node.h"
 #include <string>
 #include <vector>
+#include <map>
 
 namespace chtl {
 
-// 自定义样式组节点
+// 自定义样式组节点 - [Custom] @Style
 class CustomStyleNode : public Node {
 private:
     std::string name;
@@ -33,7 +34,7 @@ public:
     }
 };
 
-// 自定义元素节点
+// 自定义元素节点 - [Custom] @Element
 class CustomElementNode : public Node {
 private:
     std::string name;
@@ -59,7 +60,7 @@ public:
     }
 };
 
-// 自定义变量组节点
+// 自定义变量组节点 - [Custom] @Var
 class CustomVarNode : public Node {
 private:
     std::string name;
@@ -102,75 +103,7 @@ public:
     }
 };
 
-// 操作节点基类
-class OperationNode : public Node {
-protected:
-    std::string target;  // 操作目标
-    
-public:
-    OperationNode(NodeType t, const std::string& tgt, int line = 0, int col = 0)
-        : Node(t, line, col), target(tgt) {}
-    
-    const std::string& getTarget() const { return target; }
-    void setTarget(const std::string& t) { target = t; }
-};
-
-// Add操作节点
-class AddNode : public OperationNode {
-public:
-    AddNode(const std::string& target, int line = 0, int col = 0)
-        : OperationNode(NodeType::ADD_NODE, target, line, col) {}
-    
-    std::string toString() const override {
-        return "AddNode: " + target;
-    }
-};
-
-// Delete操作节点
-class DeleteNode : public OperationNode {
-public:
-    DeleteNode(const std::string& target, int line = 0, int col = 0)
-        : OperationNode(NodeType::DELETE_NODE, target, line, col) {}
-    
-    std::string toString() const override {
-        return "DeleteNode: " + target;
-    }
-};
-
-// Inherit操作节点
-class InheritNode : public OperationNode {
-public:
-    InheritNode(const std::string& target, int line = 0, int col = 0)
-        : OperationNode(NodeType::INHERIT_NODE, target, line, col) {}
-    
-    std::string toString() const override {
-        return "InheritNode: " + target;
-    }
-};
-
-// 索引访问节点
-class IndexAccessNode : public Node {
-private:
-    std::string elementName;
-    int index;
-    
-public:
-    IndexAccessNode(const std::string& elem, int idx, int line = 0, int col = 0)
-        : Node(NodeType::INDEX_ACCESS_NODE, line, col), 
-          elementName(elem), index(idx) {}
-    
-    const std::string& getElementName() const { return elementName; }
-    int getIndex() const { return index; }
-    
-    void setElementName(const std::string& name) { elementName = name; }
-    void setIndex(int idx) { index = idx; }
-    
-    std::string toString() const override {
-        return "IndexAccessNode: " + elementName + "[" + std::to_string(index) + "]";
-    }
-};
-
-// 变量使用节点
+// 变量使用节点 - 用于表示变量组的使用，如 ThemeColor(tableColor)
 class VarUsageNode : public Node {
 private:
     std::string varGroupName;

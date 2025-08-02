@@ -22,8 +22,12 @@ enum class NodeType {
     // 基础节点
     TEXT_NODE,              // text { }
     ELEMENT_NODE,           // HTML元素节点
-    ATTRIBUTE_NODE,         // 属性节点
+    
+    // 注释节点
     COMMENT_NODE,           // 注释节点
+    
+    // 属性节点
+    ATTRIBUTE_NODE,         // 属性节点
     
     // 样式相关节点
     STYLE_NODE,             // style { }
@@ -219,23 +223,6 @@ public:
     
     std::string toString() const override {
         return "AttributeNode: " + name + " = " + value;
-    }
-};
-
-// 样式节点
-class StyleNode : public Node {
-private:
-    bool isInline;  // 是否是内联样式
-    
-public:
-    StyleNode(bool inline_style = false, int line = 0, int col = 0)
-        : Node(NodeType::STYLE_NODE, line, col), isInline(inline_style) {}
-    
-    bool getIsInline() const { return isInline; }
-    void setIsInline(bool value) { isInline = value; }
-    
-    std::string toString() const override {
-        return isInline ? "InlineStyleNode" : "StyleNode";
     }
 };
 
