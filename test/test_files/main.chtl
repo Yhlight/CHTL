@@ -1,0 +1,3 @@
+[Import] @Style from "style.css"
+[Import] @Chtl from module.sub
+div { }

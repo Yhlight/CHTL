@@ -1,29 +1,35 @@
 CXX = g++
 CXXFLAGS = -std=c++14 -Wall -g
+INCLUDES = -I../src
+
+# 目标可执行文件
+TARGETS = TokenTest LexerTest LoaderTest
 
 # 源文件
-SRC_DIR = ../src
-COMMON_SRC = $(SRC_DIR)/common/Token.cpp
-LEXER_SRC = $(SRC_DIR)/lexer/Lexer.cpp $(SRC_DIR)/lexer/BasicLexer.cpp $(SRC_DIR)/lexer/ConfigLexer.cpp
+COMMON_SRC = ../src/common/Token.cpp
+LEXER_SRC = ../src/lexer/Lexer.cpp ../src/lexer/BasicLexer.cpp ../src/lexer/ConfigLexer.cpp
+LOADER_SRC = ../src/loader/ChtlLoader.cpp
 
-# 测试目标
-all: TokenTest LexerTest
+all: $(TARGETS)
 
 TokenTest: TokenTest.cpp $(COMMON_SRC)
-	$(CXX) $(CXXFLAGS) -o TokenTest TokenTest.cpp $(COMMON_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 LexerTest: LexerTest.cpp $(COMMON_SRC) $(LEXER_SRC)
-	$(CXX) $(CXXFLAGS) -o LexerTest LexerTest.cpp $(COMMON_SRC) $(LEXER_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# 运行所有测试
-test: TokenTest LexerTest
+LoaderTest: LoaderTest.cpp $(LOADER_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+test: $(TARGETS)
 	@echo "Running Token Tests..."
 	./TokenTest
 	@echo "\nRunning Lexer Tests..."
 	./LexerTest
+	@echo "\nRunning Loader Tests..."
+	./LoaderTest
 
-# 清理
 clean:
-	rm -f TokenTest LexerTest *.o
+	rm -f $(TARGETS) *.o
 
 .PHONY: all test clean
