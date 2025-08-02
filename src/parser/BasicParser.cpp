@@ -594,9 +594,8 @@ NodePtr BasicParser::parseConfiguration() {
             
             consume(TokenType::SEMICOLON, "Expected ';' after configuration item");
         }
-        
         // 检查 [Name] 块
-        if (match(TokenType::LEFT_BRACKET)) {
+        else if (match(TokenType::LEFT_BRACKET)) {
             if (check(TokenType::IDENTIFIER) && peek().value == "Name") {
                 advance(); // consume "Name"
                 consume(TokenType::RIGHT_BRACKET, "Expected ']' after Name");
@@ -622,7 +621,13 @@ NodePtr BasicParser::parseConfiguration() {
                 
                 consume(TokenType::RIGHT_BRACE, "Expected '}' after [Name] block");
                 configNode->addChild(nameBlock);
+            } else {
+                // 不是[Name]，退回[
+                current--;
             }
+        } else {
+            // 其他情况，跳过
+            advance();
         }
     }
     
@@ -640,10 +645,80 @@ NodePtr BasicParser::parseConfigurationItem() {
     std::string key = advance().value;
     consume(TokenType::EQUALS, "Expected '=' in configuration item");
     
+    // 检查是否是组选项
+    if (check(TokenType::LEFT_BRACKET)) {
+        advance(); // consume [
+        
+        std::vector<std::string> options;
+        std::string firstValue;
+        
+        while (!check(TokenType::RIGHT_BRACKET) && !isAtEnd()) {
+            std::string optValue;
+            
+            if (check(TokenType::STRING_LITERAL) || check(TokenType::STRING_LITERAL_SINGLE)) {
+                optValue = parseStringLiteral();
+            } else if (check(TokenType::IDENTIFIER)) {
+                optValue = advance().value;
+            } else if (check(TokenType::AT)) {
+                optValue = advance().value;
+                if (check(TokenType::IDENTIFIER)) {
+                    optValue += advance().value;
+                }
+            } else if (match(TokenType::LEFT_BRACKET)) {
+                // [Custom] 这样的关键字
+                optValue = "[";
+                if (check(TokenType::IDENTIFIER)) {
+                    optValue += advance().value;
+                }
+                consume(TokenType::RIGHT_BRACKET, "Expected ']'");
+                optValue += "]";
+            }
+            
+            if (!optValue.empty()) {
+                options.push_back(optValue);
+                if (firstValue.empty()) {
+                    firstValue = optValue;
+                }
+            }
+            
+            if (!match(TokenType::COMMA)) {
+                break;
+            }
+        }
+        
+        consume(TokenType::RIGHT_BRACKET, "Expected ']' after options");
+        consume(TokenType::SEMICOLON, "Expected ';' after configuration item");
+        
+        auto itemNode = std::make_shared<ConfigItemNode>(key, firstValue, 
+            previous().line, previous().column);
+        for (const auto& opt : options) {
+            itemNode->addOption(opt);
+        }
+        return itemNode;
+    }
+    
+    // 单个值
     std::string value;
     if (check(TokenType::STRING_LITERAL) || check(TokenType::STRING_LITERAL_SINGLE)) {
         value = parseStringLiteral();
-    } else if (check(TokenType::IDENTIFIER) || check(TokenType::NUMBER)) {
+    } else if (check(TokenType::IDENTIFIER)) {
+        value = advance().value;
+    } else if (check(TokenType::NUMBER)) {
+        value = advance().value;
+    } else if (check(TokenType::AT)) {
+        value = advance().value;
+        if (check(TokenType::IDENTIFIER)) {
+            value += advance().value;
+        }
+    } else if (match(TokenType::LEFT_BRACKET)) {
+        // [Custom] 这样的关键字
+        value = "[";
+        if (check(TokenType::IDENTIFIER)) {
+            value += advance().value;
+        }
+        consume(TokenType::RIGHT_BRACKET, "Expected ']'");
+        value += "]";
+    } else if (check(TokenType::KEYWORD_TRUE) || check(TokenType::KEYWORD_FALSE)) {
         value = advance().value;
     }
     

@@ -14,18 +14,18 @@ protected:
     std::string currentFilePath;         // 当前解析的文件路径
     
     // 解析辅助方法
-    NodePtr parseStatement();
+    virtual NodePtr parseStatement();
     NodePtr parseElement();
     NodePtr parseTextNode();
     NodePtr parseStyleNode();
     NodePtr parseComment();
     NodePtr parseImport();
     NodePtr parseConfiguration();
-    NodePtr parseCustomDefinition();
-    NodePtr parseTemplateDefinition();
+    virtual NodePtr parseCustomDefinition();
+    virtual NodePtr parseTemplateDefinition();
     NodePtr parseNamespace();
     NodePtr parseExpect();
-    NodePtr parseOrigin();
+    virtual NodePtr parseOrigin();
     
     // 解析元素内容
     void parseElementContent(ElementNode* element);

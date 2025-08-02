@@ -3,13 +3,13 @@ CXXFLAGS = -std=c++14 -Wall -g
 INCLUDES = -I../src
 
 # 目标可执行文件
-TARGETS = TokenTest LexerTest LoaderTest ParserTest ParserAdvancedTest
+TARGETS = TokenTest LexerTest LoaderTest ParserTest ParserAdvancedTest ConfigParserTest
 
 # 源文件
 COMMON_SRC = ../src/common/Token.cpp
 LEXER_SRC = ../src/lexer/Lexer.cpp ../src/lexer/BasicLexer.cpp ../src/lexer/ConfigLexer.cpp
 LOADER_SRC = ../src/loader/ChtlLoader.cpp
-PARSER_SRC = ../src/parser/Parser.cpp ../src/parser/BasicParser.cpp
+PARSER_SRC = ../src/parser/Parser.cpp ../src/parser/BasicParser.cpp ../src/parser/ConfigParser.cpp
 
 all: $(TARGETS)
 
@@ -28,6 +28,9 @@ ParserTest: ParserTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC
 ParserAdvancedTest: ParserAdvancedTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+ConfigParserTest: ConfigParserTest.cpp $(COMMON_SRC) $(LEXER_SRC) $(LOADER_SRC) $(PARSER_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 test: $(TARGETS)
 	@echo "Running Token Tests..."
 	./TokenTest
@@ -39,6 +42,8 @@ test: $(TARGETS)
 	./ParserTest
 	@echo "\nRunning Advanced Parser Tests..."
 	./ParserAdvancedTest
+	@echo "\nRunning Config Parser Tests..."
+	./ConfigParserTest
 
 clean:
 	rm -f $(TARGETS) *.o
