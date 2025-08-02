@@ -2,7 +2,6 @@
 #include "Node.h"
 #include <vector>
 #include <unordered_map>
-#include <variant>
 
 namespace chtl {
 
@@ -70,8 +69,36 @@ public:
         OPTION_COUNT          // OPTION_COUNT = 数值
     };
     
-    // 配置值类型
-    using ConfigValue = std::variant<int, bool, std::string>;
+    // 配置值类型（C++14兼容）
+    enum class ValueType {
+        INT_VALUE,
+        BOOL_VALUE,
+        STRING_VALUE
+    };
+    
+    struct ConfigValue {
+        ValueType type;
+        union {
+            int intValue;
+            bool boolValue;
+        };
+        std::string stringValue;
+        
+        ConfigValue() : type(ValueType::STRING_VALUE), stringValue("") {}
+        ConfigValue(int value) : type(ValueType::INT_VALUE), intValue(value) {}
+        ConfigValue(bool value) : type(ValueType::BOOL_VALUE), boolValue(value) {}
+        ConfigValue(const std::string& value) : type(ValueType::STRING_VALUE), stringValue(value) {}
+        
+        // 类型检查方法
+        bool isInt() const { return type == ValueType::INT_VALUE; }
+        bool isBool() const { return type == ValueType::BOOL_VALUE; }
+        bool isString() const { return type == ValueType::STRING_VALUE; }
+        
+        // 值访问方法
+        int asInt() const { return isInt() ? intValue : 0; }
+        bool asBool() const { return isBool() ? boolValue : false; }
+        const std::string& asString() const { return stringValue; }
+    };
     
     explicit ConfigOptionNode(OptionType type, const ConfigValue& value,
                              const NodePosition& position = NodePosition());

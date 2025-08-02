@@ -47,17 +47,7 @@ std::unordered_map<std::string, std::string> StyleBlockNode::getInlineProperties
     return inlineProperties_;
 }
 
-void StyleBlockNode::addStyleGroupCall(std::shared_ptr<StyleGroupCallNode> call) {
-    if (call) {
-        addChild(call);
-    }
-}
-
-std::vector<std::shared_ptr<StyleGroupCallNode>> StyleBlockNode::getStyleGroupCalls() const {
-    std::vector<std::shared_ptr<StyleGroupCallNode>> calls;
-    // 暂时返回空列表，等待StyleGroupCallNode实现
-    return calls;
-}
+// StyleGroupCall功能已移至CustomStyleNode，此处不再需要实现
 
 bool StyleBlockNode::hasInlineStyles() const {
     return !inlineProperties_.empty();
@@ -68,7 +58,7 @@ bool StyleBlockNode::hasCssRules() const {
 }
 
 bool StyleBlockNode::hasStyleGroupCalls() const {
-    return false; // 暂时返回false，等待StyleGroupCallNode实现
+    return false; // StyleGroupCall功能已移至CustomStyleNode
 }
 
 bool StyleBlockNode::validate() const {

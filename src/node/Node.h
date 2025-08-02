@@ -64,10 +64,6 @@ enum class NodeType {
     VARIABLE_CALL,           // 变量调用节点
     VARIABLE_DEFINITION,     // 变量定义节点
     
-    // 样式组相关
-    STYLE_GROUP,             // 样式组节点
-    STYLE_GROUP_CALL,        // 样式组调用节点
-    
     // 伪类和伪元素
     PSEUDO_CLASS,            // 伪类节点
     PSEUDO_ELEMENT,          // 伪元素节点

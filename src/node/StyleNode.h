@@ -24,8 +24,7 @@ public:
     std::unordered_map<std::string, std::string> getInlineProperties() const;
     
     // 样式组调用管理
-    void addStyleGroupCall(std::shared_ptr<class StyleGroupCallNode> call);
-    std::vector<std::shared_ptr<class StyleGroupCallNode>> getStyleGroupCalls() const;
+    // StyleGroupCall功能已移至CustomStyleNode
     
     // 样式块类型
     bool hasInlineStyles() const;
