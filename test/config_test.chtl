@@ -1,0 +1,87 @@
+// CHTL配置系统测试文件
+
+[Configuration]
+{
+    INDEX_INITIAL_COUNT = 5;
+    CUSTOM_STYLE = true;
+    DISABLE_NAME_GROUP = false;
+    DEBUG_MODE = true;
+    OPTION_COUNT = 20;
+    
+    [Name] StyleGroup
+    {
+        // 自定义关键字映射
+        主要颜色 = "primary-color";
+        次要颜色 = "secondary-color";
+        背景颜色 = "background-color";
+        文本颜色 = "text-color";
+        
+        // 组选项
+        prefix = "sg-";
+        suffix = "-style";
+        namespace = "StyleGroup";
+    }
+    
+    [Name] ElementGroup
+    {
+        // 中文元素关键字
+        容器 = "container";
+        按钮 = "button";
+        卡片 = "card";
+        导航 = "navbar";
+        
+        // 组选项
+        prefix = "el-";
+        default_class = "element";
+    }
+    
+    [Name] VariableGroup
+    {
+        // 变量关键字
+        大小 = "size";
+        间距 = "spacing";
+        颜色 = "color";
+        字体 = "font";
+        
+        // 组选项
+        prefix = "var-";
+        type = "css-variable";
+    }
+}
+
+// 使用配置后的自定义关键字
+div
+{
+    style
+    {
+        主要颜色: #007bff;
+        背景颜色: #f8f9fa;
+        文本颜色: #333;
+    }
+    
+    容器
+    {
+        class: "main-container";
+        
+        按钮
+        {
+            text { "点击我" }
+            style
+            {
+                背景颜色: 主要颜色;
+                文本颜色: #fff;
+            }
+        }
+        
+        卡片
+        {
+            style
+            {
+                背景颜色: #fff;
+                间距: 大小(lg);
+            }
+            
+            text { "这是一个卡片内容" }
+        }
+    }
+}

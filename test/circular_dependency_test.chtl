@@ -1,0 +1,15 @@
+// 文件A：测试循环依赖
+[Import] layout from layout;
+[Import] circular_b from test/circular_dependency_test_b;
+
+// 重复导入同一个模块
+[Import] layout from layout;
+[Import] components from components;
+
+html {
+    body {
+        Container {
+            "这是文件A，导入了B，B又导入了A"
+        }
+    }
+}

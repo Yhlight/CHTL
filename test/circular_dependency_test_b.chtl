@@ -1,0 +1,14 @@
+// 文件B：与A形成循环依赖
+[Import] utils from utils;
+[Import] circular_a from test/circular_dependency_test;
+
+// 同样的重复导入
+[Import] utils from utils;
+
+html {
+    body {
+        FlexCenter {
+            "这是文件B，导入了A，形成循环"
+        }
+    }
+}

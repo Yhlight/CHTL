@@ -1,0 +1,78 @@
+// 基础CHTL示例文件
+// 用于测试词法分析器和语法分析器
+
+html
+{
+    head
+    {
+        style
+        {
+            // 全局样式
+        }
+    }
+
+    body
+    {
+        div
+        {
+            id: "container";
+            class: "main-container";
+
+            style
+            {
+                width: 100%;
+                height: auto;
+
+                .main-container
+                {
+                    background: "lightblue";
+                    padding: 20px;
+                }
+
+                &:hover
+                {
+                    background: "blue";
+                }
+            }
+
+            div
+            {
+                class: "content";
+
+                text
+                {
+                    "这是一段示例文本"
+                }
+
+                span
+                {
+                    text
+                    {
+                        '单引号文本'
+                    }
+                }
+            }
+        }
+
+        div
+        {
+            class: "footer";
+            
+            style
+            {
+                #footer
+                {
+                    margin-top: 50px;
+                    text-align: center;
+                }
+            }
+        }
+    }
+}
+
+-- 这是一个生成器注释，会被输出到HTML中
+
+/* 
+这是一个多行注释
+不会被输出到HTML中
+*/

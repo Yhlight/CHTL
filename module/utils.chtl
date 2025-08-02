@@ -1,0 +1,190 @@
+// CHTL工具模块 - 提供实用的工具样式和变量
+
+[Custom] @Var UtilVariables
+{
+    // 颜色变量
+    colors: {
+        primary: "#007bff";
+        secondary: "#6c757d";
+        success: "#28a745";
+        danger: "#dc3545";
+        warning: "#ffc107";
+        info: "#17a2b8";
+        light: "#f8f9fa";
+        dark: "#343a40";
+        white: "#ffffff";
+        black: "#000000";
+        gray: "#6c757d";
+        gray-light: "#e9ecef";
+        gray-dark: "#495057";
+    }
+    
+    // 尺寸变量
+    sizes: {
+        xs: "4px";
+        sm: "8px";
+        md: "16px";
+        lg: "24px";
+        xl: "32px";
+        xxl: "48px";
+    }
+    
+    // 字体大小
+    font-sizes: {
+        xs: "12px";
+        sm: "14px";
+        md: "16px";
+        lg: "18px";
+        xl: "24px";
+        xxl: "32px";
+        xxxl: "48px";
+    }
+    
+    // 断点
+    breakpoints: {
+        xs: "480px";
+        sm: "768px";
+        md: "992px";
+        lg: "1200px";
+        xl: "1400px";
+    }
+    
+    // 阴影
+    shadows: {
+        sm: "0 1px 3px rgba(0,0,0,0.12)";
+        md: "0 4px 6px rgba(0,0,0,0.1)";
+        lg: "0 10px 15px rgba(0,0,0,0.1)";
+        xl: "0 20px 25px rgba(0,0,0,0.1)";
+    }
+    
+    // 边框半径
+    radius: {
+        none: "0";
+        sm: "2px";
+        md: "4px";
+        lg: "8px";
+        xl: "12px";
+        full: "50%";
+    }
+}
+
+[Custom] @Style UtilityStyles
+{
+    // 间距工具类
+    margin-0: { margin: 0; }
+    margin-1: { margin: UtilVariables.sizes.xs; }
+    margin-2: { margin: UtilVariables.sizes.sm; }
+    margin-3: { margin: UtilVariables.sizes.md; }
+    margin-4: { margin: UtilVariables.sizes.lg; }
+    margin-5: { margin: UtilVariables.sizes.xl; }
+    
+    padding-0: { padding: 0; }
+    padding-1: { padding: UtilVariables.sizes.xs; }
+    padding-2: { padding: UtilVariables.sizes.sm; }
+    padding-3: { padding: UtilVariables.sizes.md; }
+    padding-4: { padding: UtilVariables.sizes.lg; }
+    padding-5: { padding: UtilVariables.sizes.xl; }
+    
+    // 文本工具类
+    text-left: { text-align: left; }
+    text-center: { text-align: center; }
+    text-right: { text-align: right; }
+    text-justify: { text-align: justify; }
+    
+    text-primary: { color: UtilVariables.colors.primary; }
+    text-secondary: { color: UtilVariables.colors.secondary; }
+    text-success: { color: UtilVariables.colors.success; }
+    text-danger: { color: UtilVariables.colors.danger; }
+    text-warning: { color: UtilVariables.colors.warning; }
+    text-info: { color: UtilVariables.colors.info; }
+    text-light: { color: UtilVariables.colors.light; }
+    text-dark: { color: UtilVariables.colors.dark; }
+    
+    // 字体大小
+    text-xs: { font-size: UtilVariables.font-sizes.xs; }
+    text-sm: { font-size: UtilVariables.font-sizes.sm; }
+    text-md: { font-size: UtilVariables.font-sizes.md; }
+    text-lg: { font-size: UtilVariables.font-sizes.lg; }
+    text-xl: { font-size: UtilVariables.font-sizes.xl; }
+    text-xxl: { font-size: UtilVariables.font-sizes.xxl; }
+    
+    // 字体粗细
+    font-thin: { font-weight: 100; }
+    font-light: { font-weight: 300; }
+    font-normal: { font-weight: 400; }
+    font-medium: { font-weight: 500; }
+    font-semibold: { font-weight: 600; }
+    font-bold: { font-weight: 700; }
+    font-extrabold: { font-weight: 800; }
+    font-black: { font-weight: 900; }
+    
+    // 显示工具类
+    block: { display: block; }
+    inline: { display: inline; }
+    inline-block: { display: inline-block; }
+    flex: { display: flex; }
+    inline-flex: { display: inline-flex; }
+    grid: { display: grid; }
+    hidden: { display: none; }
+    
+    // 位置工具类
+    relative: { position: relative; }
+    absolute: { position: absolute; }
+    fixed: { position: fixed; }
+    sticky: { position: sticky; }
+    static: { position: static; }
+    
+    // 浮动工具类
+    float-left: { float: left; }
+    float-right: { float: right; }
+    float-none: { float: none; }
+    clearfix: { 
+        &::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    }
+    
+    // 边框工具类
+    border: { border: 1px solid UtilVariables.colors.gray-light; }
+    border-0: { border: 0; }
+    border-top: { border-top: 1px solid UtilVariables.colors.gray-light; }
+    border-bottom: { border-bottom: 1px solid UtilVariables.colors.gray-light; }
+    border-left: { border-left: 1px solid UtilVariables.colors.gray-light; }
+    border-right: { border-right: 1px solid UtilVariables.colors.gray-light; }
+    
+    // 圆角工具类
+    rounded-none: { border-radius: UtilVariables.radius.none; }
+    rounded-sm: { border-radius: UtilVariables.radius.sm; }
+    rounded: { border-radius: UtilVariables.radius.md; }
+    rounded-lg: { border-radius: UtilVariables.radius.lg; }
+    rounded-xl: { border-radius: UtilVariables.radius.xl; }
+    rounded-full: { border-radius: UtilVariables.radius.full; }
+    
+    // 阴影工具类
+    shadow-none: { box-shadow: none; }
+    shadow-sm: { box-shadow: UtilVariables.shadows.sm; }
+    shadow: { box-shadow: UtilVariables.shadows.md; }
+    shadow-lg: { box-shadow: UtilVariables.shadows.lg; }
+    shadow-xl: { box-shadow: UtilVariables.shadows.xl; }
+    
+    // 宽度工具类
+    w-full: { width: 100%; }
+    w-auto: { width: auto; }
+    w-1/2: { width: 50%; }
+    w-1/3: { width: 33.333333%; }
+    w-2/3: { width: 66.666667%; }
+    w-1/4: { width: 25%; }
+    w-3/4: { width: 75%; }
+    
+    // 高度工具类
+    h-full: { height: 100%; }
+    h-auto: { height: auto; }
+    h-screen: { height: 100vh; }
+    h-1/2: { height: 50%; }
+    h-1/3: { height: 33.333333%; }
+    h-2/3: { height: 66.666667%; }
+    h-1/4: { height: 25%; }
+    h-3/4: { height: 75%; }
+}

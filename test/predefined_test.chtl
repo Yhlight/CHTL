@@ -1,0 +1,100 @@
+// 测试预定义系统的CHTL文件
+
+// 使用预定义的颜色变量组
+[Custom] @Var PageColors
+{
+    primary: Colors(primary);
+    secondary: Colors(secondary);
+    background: Colors(light);
+    text: Colors(textPrimary);
+}
+
+// 使用预定义的容器样式
+[Custom] @Style PageContainer
+{
+    ContainerStyle;
+    background-color: PageColors(background);
+    color: PageColors(text);
+}
+
+// 使用预定义的按钮样式
+[Custom] @Style PrimaryButton
+{
+    ButtonStyle;
+    background-color: PageColors(primary);
+    border-color: PageColors(primary);
+}
+
+// 使用预定义的卡片元素
+[Custom] @Element WelcomeCard
+{
+    Card
+    {
+        style
+        {
+            PageContainer;
+            
+            .card-header
+            {
+                background-color: PageColors(primary);
+                color: Colors(light);
+                padding: Spacing(spacingLg);
+            }
+            
+            .card-body
+            {
+                padding: Spacing(spacingXl);
+            }
+        }
+    }
+}
+
+// 主页面结构
+html
+{
+    head
+    {
+        title
+        {
+            text { "CHTL预定义系统测试" }
+        }
+    }
+    
+    body
+    {
+        style
+        {
+            PageContainer;
+        }
+        
+        div
+        {
+            class: "container";
+            
+            WelcomeCard
+            {
+                div
+                {
+                    class: "card-header";
+                    text { "欢迎使用CHTL" }
+                }
+                
+                div
+                {
+                    class: "card-body";
+                    
+                    p
+                    {
+                        text { "这是一个展示预定义系统功能的示例页面。" }
+                    }
+                    
+                    Button
+                    {
+                        style { PrimaryButton; }
+                        text { "开始使用" }
+                    }
+                }
+            }
+        }
+    }
+}
